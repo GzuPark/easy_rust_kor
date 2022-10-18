@@ -32,7 +32,7 @@ Rust는 새로운 언어지만 이미 아주 인기가 있습니다. 그 인기�
 
 - [Part 1 - 브라우저에서의 Rust](#part-1---브라우저에서의-rust)
   - [Rust Playground](#rust-playground)
-  - [🚧 and ⚠️](#-and-️)
+  - [🚧 과 ⚠️](#-과-️)
   - [Comments](#comments)
   - [Types](#types)
     - [Primitive types](#primitive-types)
@@ -163,3 +163,7 @@ Rust는 새로운 언어지만 이미 아주 인기가 있습니다. 그 인기�
 - Config: 여기에서 테마를 다크 모드로 변경하여 야간 작업 및 기타 여러 구성을 할 수 있습니다.
 
 만약 Rust를 설치하고 싶다면 [https://www.rust-lang.org/tools/install](https://www.rust-lang.org/tools/install)로 이동하여 세부 지침을 따라하세요. 일반적으로 `rustup`을 사용하여 Rust를 설치하고 업데이트합니다.
+
+## 🚧 과 ⚠️
+
+간혹 책의 코드 예제가 동작하지 않을 수 있습니다. 예제가 작동하지 않으면 🚧 또는 ⚠️이 표시됩니다. 🚧는 "공사중"의 의미로 코드가 완료되지 않았음을 뜻합니다. Rust는 실행하기 위해 `fn main()`(메인함수)가 필요하지만 때로는 `fn main()`이 없는 작은 코드 조각만 보고 싶을 때가 있습니다. 그 예제들은 정확하지만 실행하려면 `fn main()`이 필요합니다. 그리고, 일부 코드 예제는 우리가 고칠 문제를 보여줍니다. 그 예제들은 `fn main()`이 있을 수 있지만 오류를 생성하므로 ⚠️가 표시됩니다.
