@@ -33,7 +33,7 @@ Rust는 새로운 언어지만 이미 아주 인기가 있습니다. 그 인기�
 - [Part 1 - 브라우저에서의 Rust](#part-1---브라우저에서의-rust)
   - [Rust Playground](#rust-playground)
   - [🚧 과 ⚠️](#-과-️)
-  - [Comments](#comments)
+  - [주석](#주석)
   - [Types](#types)
     - [Primitive types](#primitive-types)
   - [Type inference](#type-inference)
@@ -167,3 +167,46 @@ Rust는 새로운 언어지만 이미 아주 인기가 있습니다. 그 인기�
 ## 🚧 과 ⚠️
 
 간혹 책의 코드 예제가 동작하지 않을 수 있습니다. 예제가 작동하지 않으면 🚧 또는 ⚠️이 표시됩니다. 🚧는 "공사중"의 의미로 코드가 완료되지 않았음을 뜻합니다. Rust는 실행하기 위해 `fn main()`(메인함수)가 필요하지만 때로는 `fn main()`이 없는 작은 코드 조각만 보고 싶을 때가 있습니다. 그 예제들은 정확하지만 실행하려면 `fn main()`이 필요합니다. 그리고, 일부 코드 예제는 우리가 고칠 문제를 보여줍니다. 그 예제들은 `fn main()`이 있을 수 있지만 오류를 생성하므로 ⚠️가 표시됩니다.
+
+## 주석
+**[이 챕터를 YouTube에서 보기](https://youtu.be/x7GlQjh2aSw)**
+
+주석은 컴퓨터가 아니라 프로그래머가 읽을 수 있도록 작성되는 것입니다. 다른 사람들이 코드를 이해하는 데 도움이 되도록 주석을 작성하는 것이 좋습니다. 또한 나중에 코드를 이해하는 데 도움이 됩니다. (많은 사람들이 좋은 코드를 작성하지만 왜 작성했는지 잊어버리곤 합니다.) Rust에서 주석을 작성하려면 일반적으로 `//`를 사용합니다:
+
+```rust
+fn main() {
+    // Rust 프로그램은 fn main()으로 시작합니다.
+    // 코드를 블록 안에 넣으세요. { 로 시작해서 } 로 끝납니다.
+    let some_number = 100; // 여기에 원하는만큼 주석을 작성할 수 있으며 컴파일러는 이것을 보지 않을겁니다.
+}
+```
+
+위와 같이 한다면 컴파일러는 `//`의 오른쪽에 있는 아무 것도 보지 않을겁니다.
+
+`/*`로 시작해서 `*/`로 끝나는 다른 종류의 주석이 있습니다. 이것은 코드 중간에 작성하는데 유용한 방법입니다.
+
+```rust
+fn main() {
+    let some_number/*: i16*/ = 100;
+}
+```
+
+컴파일러에게 `let some_number/*: i16*/ = 100;`은 `let some_number = 100;`과 같이 보입니다.
+
+The `/* */` form is also useful for very long comments over more than one line. In this example you can see that you need to write `//` for every line. But if you type `/*`, it won't stop until you finish it with `*/`.
+
+`/* */` 형식은 한 줄 이상의 매우 긴 주석에도 유용합니다. 아래 예제에서 모든 줄에 `//`을 작성해야하는 것을 볼 수 있습니다. 그러나 `/*`를 입력하면 `*/`로 끝날 때까지 멈추지 않습니다.
+
+```rust
+fn main() {
+    let some_number = 100; /* 이 숫자에 대해
+    약간의 설명을 하겠습니다.
+    나의 가장 좋아하는 숫자 100 입니다.
+    some_number 라고 불리지만 사실 제 생각에는... */
+
+    let some_number = 100; // 이 숫자에 대해
+    // 약간의 설명을 하겠습니다.
+    // 나의 가장 좋아하는 숫자 100 입니다.
+    // some_number 라고 불리지만 사실 제 생각에는...
+}
+```
