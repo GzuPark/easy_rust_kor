@@ -44,7 +44,7 @@ Rust는 새로운 언어지만 이미 아주 인기가 있습니다. 그 인기�
     - [가작 작은 숫자와 가장 큰 숫자](#가작-작은-숫자와-가장-큰-숫자)
   - [Mutability (가변성)](#mutability-가변성)
     - [Shadowing](#shadowing)
-  - [The stack, the heap, and pointers](#the-stack-the-heap-and-pointers)
+  - [스택, 힙, 그리고 포인터](#스택-힙-그리고-포인터)
   - [More about printing](#more-about-printing)
   - [Strings](#strings)
   - [const and static](#const-and-static)
@@ -855,3 +855,52 @@ fn main() {
 ```
 
 일반적으로 Rust는 shadowing을 볼 수 있습니다. 빠르게 변수를 가져와서 무언가를 수행하고 다른 작업을 다시 수행할 경우에 일어납니다. 그리고, 보통은 그다지 신경쓰지 않는 빠른 변수에 사용합니다.
+
+## 스택, 힙, 그리고 포인터
+
+Rust에서 스택, 힙, 포인터는 매우 중요합니다.
+
+스택과 힙은 컴퓨터 메모리를 유지하는 두 공간입니다. 중요한 차이점은 다음과 같습니다:
+
+- 스택은 매우 빠르지만 힙은 그렇게 빠르지 않습니다. 아주 느리지도 않지만 스택은 항상 더 빠릅니다. 그러나 다음과 같은 이유로 항상 스택을 사용할 수는 없습니다, 왜냐하면:
+- Rust는 컴파일 타임에 변수의 크기를 알아야 합니다. `i32`와 같은 간단한 변수는 정확한 크기를 알고 있기 때문에 스택에 저장됩니다. 32 bits = 4 bytes 이기 때문에 `i32`는 4 bytes 라는 것을 항상 알고 있습니다. 따라서 `i32`는 항상 스택에 들어갈 수 있습니다.
+- 그러나 일부 유형은 컴파일 시간에 그 크기를 알 수 없습니다. 그러나 스택은 정확한 크기를 알아야 합니다. 그래서 무엇을 할 수 있을까요? 힙은 모든 크기의 데이터를 가질 수 있기 때문에 먼저 데이터를 힙에 넣습니다. 그리고 그것을 찾기 위해 포인터가 스택에 올라가게 됩니다. 항상 포인터의 크기를 알고 있기 때문에 이 방법은 괜찮습니다. 따라서 컴퓨터는 먼저 스택으로 이동하여 포인터를 읽고 데이터가 있는 힙을 보게 됩니다.
+
+포인터는 복잡해 보이지만 쉽습니다. 포인터는 책의 목차와 같습니다. 책을 상상해보세요:
+
+```text
+MY BOOK
+
+TABLE OF CONTENTS
+
+Chapter                        Page
+Chapter 1: My life              1
+Chapter 2: My cat               15
+Chapter 3: My job               23
+Chapter 4: My family            30
+Chapter 5: Future plans         43
+```
+
+위 예제에 따르면 이는 5개의 포인터와 같습니다. 포인터를 읽고 포인터가 보여주는 정보를 찾을 수 있습니다. "My life" 챕터는 어디에 있을까요? 1 페이지에 있습니다 (1 페이지를 *point* 하고 있습니다). "My job" 챕터는 어디에 있나요? 23 페이지에 있습니다.
+
+Rust에서 일반적으로 볼 수 있는 포인터를 **reference (참조)** 라고 합니다. 이것은 알아야 할 중요한 부분입니다: 참조는 다른 메모리를 가리키고 있씁니다. 참조는 값을 *borrow (빌림)* 하지만 own(소유)하지 않는다는 것을 말합니다. 책과 동일합니다: 목차는 정보를 소유하지 않고, 챕터가 정보를 소유하고 있습니다. Rust에서는 참조 앞에 `&`를 사용합니다. 그래서:
+
+- `let my_variable = 8`은 일반 변수를 만들지만
+- `let my_reference = &my_variable`은 참조를 생성합니다.
+
+`my_reference = &my_variable`은 다음과 같이 읽을 수 있습니다: "my_reference는 my_variable에 대한 참조입니다". 또는: "my_reference는 my_variable로 부터 참조합니다".
+
+이는 `my_reference`가 `my_variable`의 데이터만 보고 있음을 의미합니다. `my_variable`은 여전히 자신의 데이터를 소유하고 있습니다.
+
+참조에 대한 참조 또는 그 어떤 숫자의 참조도 가능합니다.
+
+```rust
+fn main() {
+    let my_number = 15; // 변수 타입은 i32 입니다.
+    let single_reference = &my_number; //  &i32 입니다.
+    let double_reference = &single_reference; // &&i32 입니다.
+    let five_references = &&&&&my_number; // &&&&&i32 입니다.
+}
+```
+
+"친구의 친구"가 "친구"와 다른 것과 마찬가지로 위 예제는 모두 다른 타입 입니다.
