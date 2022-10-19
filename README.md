@@ -45,7 +45,7 @@ Rust는 새로운 언어지만 이미 아주 인기가 있습니다. 그 인기�
   - [Mutability (가변성)](#mutability-가변성)
     - [Shadowing](#shadowing)
   - [스택, 힙, 그리고 포인터](#스택-힙-그리고-포인터)
-  - [More about printing](#more-about-printing)
+  - [출력에 대해 더 알아보기](#출력에-대해-더-알아보기)
   - [Strings](#strings)
   - [const and static](#const-and-static)
   - [More on references](#more-on-references)
@@ -904,3 +904,307 @@ fn main() {
 ```
 
 "친구의 친구"가 "친구"와 다른 것과 마찬가지로 위 예제는 모두 다른 타입 입니다.
+
+## 출력에 대해 더 알아보기
+
+Rust에서는 원하는 거의 모든 방식으로 출력을 할 수 있습니다. 출력에 대해 알아야할 몇 가지 추가 사항입니다.
+
+`\n`을 추가하면 새로운 줄이 생성되고, `\t`는 탭 공간을 생성됩니다:
+
+```rust
+fn main() {
+    // Note: print! 입니다, println! 이 아닙니다.
+    print!("\t Start with a tab\nand move to a new line");
+}
+```
+
+위 예제는 아래와 같이 출력됩니다:
+
+```text
+         Start with a tab
+and move to a new line
+```
+
+`""` 안에는 문제 없이 여러 줄을 쓸 수 있지만 간격에 대해 주의해야 합니다:
+
+```rust
+fn main() {
+    // Note: 첫번째 줄 이후에는 맨 왼쪽에서 시작합니다.
+    // 만약 아래의 println! 처럼 사용하면, 공백이 추가될 것입니다.
+    println!("Inside quotes
+you can write over
+many lines
+and it will print just fine.");
+
+    println!("If you forget to write
+    on the left side, the spaces
+    will be added when you print.");
+}
+```
+
+위 예제는 아래와 같이 출력됩니다:
+
+```text
+Inside quotes
+you can write over
+many lines
+and it will print just fine.
+If you forget to write
+    on the left side, the spaces
+    will be added when you print.
+```
+
+만약 `\n`("escape 문자"라고 불립니다)와 같은 문자를 인쇄하려면 `\`을 추가하면 가능합니다:
+
+```rust
+fn main() {
+    println!("Here are two escape characters: \\n and \\t");
+}
+```
+
+위 예제는 아래와 같이 출력됩니다:
+
+```text
+Here are two escape characters: \n and \t
+```
+
+때로는 `"`와 escape 문자가 너무 많아서 Rust가 모든 것을 무시하길 바랄때가 있습니다. 그렇게 하기 위해서는 시작 부분에 `r#`을 추가하고 마지막에 `#`을 추가하면 됩니다.
+
+```rust
+fn main() {
+    println!("He said, \"You can find the file at c:\\files\\my_documents\\file.txt.\" Then I found the file."); // 다섯번의 \ 을 사용합니다.
+    println!(r#"He said, "You can find the file at c:\files\my_documents\file.txt." Then I found the file."#)
+}
+```
+
+위 예제는 같은 것을 출력하지만 `r#`을 사용함으로써 사람이 더 쉽게 읽을 수 있게 만들어줍니다.
+
+```text
+He said, "You can find the file at c:\files\my_documents\file.txt." Then I found the file.
+He said, "You can find the file at c:\files\my_documents\file.txt." Then I found the file.
+```
+
+만약 내부에 `#`을 사용해서 인쇄해야하는 경우 `r##`으로 시작하여 `##`로 끝내면 됩니다. 그리고 둘 이상이 필요한 경우 양쪽에 `#`을 하나씩 추가해주면 됩니다.
+
+아래의 네 가지 예시를 확인하세요:
+
+```rust
+fn main() {
+
+    let my_string = "'Ice to see you,' he said."; // 작은 따옴표
+    let quote_string = r#""Ice to see you," he said."#; // 큰 따옴표
+    let hashtag_string = r##"The hashtag #IceToSeeYou had become very popular."##; // 1개의 #이 있으므로 최소한 ##이 필요합니다.
+    let many_hashtags = r####""You don't have to type ### to use a hashtag. You can just use #.""####; // 3개의 #인 ###이 있으므로 최소한 ####이 필요합니다.
+
+    println!("{}\n{}\n{}\n{}\n", my_string, quote_string, hashtag_string, many_hashtags);
+
+}
+```
+
+위 예제는 아래와 같이 출력됩니다:
+
+```text
+'Ice to see you,' he said.
+"Ice to see you," he said.
+The hashtag #IceToSeeYou had become very popular.
+"You don't have to type ### to use a hashtag. You can just use #."
+```
+
+`r#` has another use: with it you can use a keyword (words like `let`, `fn`, etc.) as a variable name.
+`r#`에는 또 다른 용도가 있습니다: 키워드(`let`, `fn` 등과 같은 단어)를 변수 이름으로 사용할 수 있습니다.
+
+```rust
+fn main() {
+    let r#let = 6; // 변수명이 let 입니다.
+    let mut r#mut = 10; // 변수명이 mut 입니다.
+}
+```
+
+`r#`은 이전 버전의 Rust가 현재 Rust보다 적은 수의 키워드를 가지고 있기 때문에 이 기능을 가지고 있습니다. 따라서 `r#`을 사용하면 이전에는 키워드가 아니었던 변수명을 사용하는 실수를 회피할 수 있습니다.
+
+또는 어떤 이유에서인지 `return` 이라는 함수가 *정말* 필요하다면 아래와 같이 사용하면 됩니다:
+
+```rust
+fn r#return() -> u8 {
+    println!("Here is your number.");
+    8
+}
+
+fn main() {
+    let my_number = r#return();
+    println!("{}", my_number);
+}
+```
+
+위 예제는 아래와 같이 출력됩니다:
+
+```text
+Here is your number.
+8
+```
+
+따라서 아마 필요하지 않을테지만 정말로 변수에 키워드를 사용해야 한다면 `r#`을 사용할 수 있습니다.
+
+
+
+만약 `&str` 혹은 `char`의 byte를 인쇄하려면 문자열 앞에 `b`를 쓰면 됩니다. 이는 모든 ASCII 문자에 대해 동작합니다. 아래는 모든 ASCII 문자입니다:
+
+```text
+☺☻♥♦♣♠♫☼►◄↕‼¶§▬↨↑↓→∟↔▲▼123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~
+```
+
+따라서 위 문자를 아래와 같이 출력하면:
+
+```rust
+fn main() {
+    println!("{:?}", b"This will look like numbers");
+}
+```
+
+결과는 다음과 같습니다:
+
+```text
+[84, 104, 105, 115, 32, 119, 105, 108, 108, 32, 108, 111, 111, 107, 32, 108, 105, 107, 101, 32, 110, 117, 109, 98, 101, 114, 115]
+```
+
+`char`의 경우 *byte* 라고 하고, `&str`의 경우 *byte string* 이라고 합니다.
+
+
+필요한 경우엔 `b`와 `r`을 함께 사용할 수 있습니다:
+
+```rust
+fn main() {
+    println!("{:?}", br##"I like to write "#"."##);
+}
+```
+
+위 예제는 `[73, 32, 108, 105, 107, 101, 32, 116, 111, 32, 119, 114, 105, 116, 101, 32, 34, 35, 34, 46]`를 출력합니다.
+
+
+
+문자열 안에 모든 Unicode 문자를 인쇄할 수 있는 Unicode escape도 있습니다: `\u{}`. 16진수는 `{}`안에 넣어 출력할 수 있습니다. Unicode 숫자를 어떻게 출력하는지 간단한 예제를 아래에서 확인할 수 있습니다.
+
+```rust
+fn main() {
+    println!("{:X}", '행' as u32); // char as u32 로 타입 변환하여 16진수 값을 얻습니다.
+    println!("{:X}", 'H' as u32);
+    println!("{:X}", '居' as u32);
+    println!("{:X}", 'い' as u32);
+
+    println!("\u{D589}, \u{48}, \u{5C45}, \u{3044}"); // Unicode escape \u로 출력해보세요.
+}
+```
+
+
+
+`println!`은 `{}`(Display 용도) 및 `{:?}`(Debug 용도), 그리고 정돈된 출력인 `{:#?}`으로 출력할 수 있다는 것을 알고 있습니다. 그렇지만 더 많은 출력하는 방법이 있습니다.
+
+예를 들면, 참조가 있는 경우 `{:p}`를 사용하여 *포인터 주소* 를 출력할 수 있습니다. 포인터 주소는 컴퓨터 메모리의 위치를 의미합니다.
+
+```rust
+fn main() {
+    let number = 9;
+    let number_ref = &number;
+    println!("{:p}", number_ref);
+}
+```
+
+위 예제는 `0xe2bc0ffcfc` 또는 다른 주소를 출력합니다. 컴퓨터에 저장하는 위치에 따라 매번 다를 수 있습니다.
+
+또는 2진수, 16진수 그리고 8진수를 출력할 수 있습니다.
+
+```rust
+fn main() {
+    let number = 555;
+    println!("Binary: {:b}, hexadecimal: {:x}, octal: {:o}", number, number, number);
+}
+```
+
+위 예제는 `Binary: 1000101011, hexadecimal: 22b, octal: 1053`를 출력합니다.
+
+또는 번호를 추가하면서 순서를 변경할 수 있습니다. 첫번째 변수는 index 0 이고, 그 다음은 index 1 과 같은 형식입니다.
+
+```rust
+fn main() {
+    let father_name = "Vlad";
+    let son_name = "Adrian Fahrenheit";
+    let family_name = "Țepeș";
+    println!("This is {1} {2}, son of {0} {2}.", father_name, son_name, family_name);
+}
+```
+
+`father_name`은 0에 위치해 있고, `son_name`은 1에 위치해 있으며, `family_name`은 2에 위치해 있습니다. 따라서 `This is Adrian Fahrenheit Țepeș, son of Vlad Țepeș`라고 출력합니다.
+
+
+아마도 `{}` 중괄호 안에 너무 많은 변수를 사용하여 출력하기 매우 복잡한 문자열이 있을 수 있습니다. 또는 변수를 두 번 이상 출력해야 할 수도 있습니다. 그렇다면 `{}`에 이름을 추가하면 도움이 될 수 있습니다:
+
+```rust
+fn main() {
+    println!(
+        "{city1} is in {country} and {city2} is also in {country},
+but {city3} is not in {country}.",
+        city1 = "Seoul",
+        city2 = "Busan",
+        city3 = "Tokyo",
+        country = "Korea"
+    );
+}
+```
+
+위 예제는 아래와 같이 출력됩니다:
+
+```text
+Seoul is in Korea and Busan is also in Korea,
+but Tokyo is not in Korea.
+```
+
+
+Rust에서 매우 복잡한 출력을 사용하고 싶다면 이 또한 가능합니다. 방법은 다음과 같습니다:
+
+{variable(변수):padding(간격) alignment(정렬) minimum(최소).maximum(최대)}
+
+이를 이해하기 위해 아래 내용을 보면,
+
+1) 변수 이름을 원하세요? 위 예제의 {country} 처럼 작성하세요. (그런 다음 더 많은 작업을 수행하려면 뒤에 `:`을 추가해주세요.)
+2) 간격을 두기 원하세요? 예를 들어 3개의 "0 padding" 이 있는 55는 00055처럼 보입니다.
+3) 간격에 대한 정렬(왼쪽 / 중간 / 오른쪽)은 무엇인가요?
+4) 최소 길이를 원하세요? (그냥 숫자를 쓰세요.)
+5) 최대 길이를 원하세요? (앞에 `.`를 붙인 숫자를 쓰세요.)
+
+예를 들어, 왼쪽에 5개의 `ㅎ` 문자와 오른쪽에 5개의 `ㅎ`문자를 쓰는 `a`를 쓰고 싶다면:
+
+```rust
+fn main() {
+    let letter = "a";
+    println!("{:ㅎ^11}", letter);
+}
+```
+
+위 예제는 `ㅎㅎㅎㅎㅎaㅎㅎㅎㅎㅎ`로 출력됩니다. 컴파일러가 이것을 어떻게 읽는지 이해하기 위해서 1) 부터 5)를 살펴보겠습니다.
+
+- 변수 이름을 원하세요? `{:ㅎ^11}` 변수명이 없습니다. `:`앞에는 아무것도 없습니다.
+- 간격을 두기 원하세요? `{:ㅎ^11}` 네. `ㅎ`는 `:` 뒤에 오고 `^`이 있습니다. `<`는 왼쪽에 `>`은 오른쪽에 `^`는 가운데에 문자를 채우는 것을 의미합니다.
+- 최소 길이를 원하세요? `{:ㅎ^11}` 네. 뒤에 11이 있습니다.
+- 최대 길이를 원하세요? `{:ㅎ^11}` 아니오. `.` 과 그 위에 오는 숫자가 없습니다.
+
+다음은 다양한 포맷팅 형식에 대한 예시입니다.
+
+```rust
+fn main() {
+    let title = "TODAY'S NEWS";
+    println!("{:-^30}", title); // 변수명 없음, 간격 -, 가운데 정렬, 최소 길이 30
+    let bar = "|";
+    println!("{: <15}{: >15}", bar, bar); // 변수명 없음, 간격 공백, 각각 왼쪽과 오른쪽 정렬, 최소 길이 15
+    let a = "SEOUL";
+    let b = "TOKYO";
+    println!("{city1:-<15}{city2:->15}", city1 = a, city2 = b); // 변수명은 city1과 city2, 간격 -, 각각 왼쪽과 오른쪽 정렬, 최소 길이 15
+}
+```
+
+위 예제는 다음과 같이 출력됩니다:
+
+```text
+---------TODAY'S NEWS---------
+|                            |
+SEOUL--------------------TOKYO
+```
