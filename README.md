@@ -42,7 +42,7 @@ Rust는 새로운 언어지만 이미 아주 인기가 있습니다. 그 인기�
     - [변수 선언과 코드 블럭](#변수-선언과-코드-블럭)
   - [디스플레이와 디버그](#디스플레이와-디버그)
     - [가작 작은 숫자와 가장 큰 숫자](#가작-작은-숫자와-가장-큰-숫자)
-  - [Mutability (changing)](#mutability-changing)
+  - [Mutability (가변성)](#mutability-가변성)
     - [Shadowing](#shadowing)
   - [The stack, the heap, and pointers](#the-stack-the-heap-and-pointers)
   - [More about printing](#more-about-printing)
@@ -740,3 +740,118 @@ The smallest u64 is 0 and the biggest u64 is 18446744073709551615.
 The smallest i128 is -170141183460469231731687303715884105728 and the biggest i128 is 170141183460469231731687303715884105727.
 The smallest u128 is 0 and the biggest u128 is 340282366920938463463374607431768211455.
 ```
+
+## Mutability (가변성)
+**[See this chapter on YouTube](https://youtu.be/Nyyd6qn7dZY)**
+
+`let`으로 변수를 선언할 경우 그 변수는 불변성을 가집니다 (수정할 수 없습니다).
+
+아래 예제는 정상 동작하지 않습니다:
+
+```rust
+fn main() {
+    let my_number = 8;
+    my_number = 10; // ⚠️
+}
+```
+
+컴파일러는 `error[E0384]: cannot assign twice to immutable variable my_number`라고 말해줄 것입니다. 이 오류는 `let`을 사용하게 되면 변수는 불변성을 가지기 때문입니다.
+
+그러나 변수를 변경하고 싶을 때가 있습니다. 변경할 수 있는 변수를 만들기 위해서는 `let` 다음에 `mut`를 추가해주세요:
+
+```rust
+fn main() {
+    let mut my_number = 8;
+    my_number = 10;
+}
+```
+
+위 예제는 문제가 없습니다.
+
+그렇지만 타입을 변경할 수 없습니다: 심지어 `mut`도 할 수 없습니다. 아래 예제는 동작하지 않습니다:
+
+```rust
+fn main() {
+    let mut my_variable = 8; // 변수 타입은 i32 입니다. 이는 변경되지 않습니다.
+    my_variable = "Hello, world!"; // ⚠️
+}
+```
+
+컴파일러를 통해 "expected" 라는 문구를 볼 수 있을 겁니다: `expected integer, found &str`. `&str`은 곧 배우게 될 문자열 타입을 말합니다.
+
+### Shadowing
+**[See this chapter on YouTube](https://youtu.be/InULHyRGw7g)**
+
+Shadowing은 `let`을 사용하여 다른 변수와 이름이 같은 새 변수를 선언하는 것을 의미합니다. Mutability처럼 보이지만 완전히 다릅니다. Shadowing을 다음과 같습니다:
+
+```rust
+fn main() {
+    let my_number = 8; // 변수 타입은 i32 입니다.
+    println!("{}", my_number); // 8 을 출력합니다.
+    let my_number = 9.2; // 같은 변수 이름이지만 f64 타입 입니다. 이는 첫 번째 my_number가 아닙니다(완전히 다른 것입니다)!
+    println!("{}", my_number) // 9.2 를 출력합니다.
+}
+```
+
+여기서 우리는 새로운 "let binding" 과 함께 `my_number`를 "shadowed" 했다고 말합니다.
+
+그래서 첫 번째 `my_number`는 파괴됐을까요? 아닙니다, 그러나 `my_number`를 호출하면 `my_number`는 `f64` 타입을 가지게 됩니다. 그리고 동일한 블럭 범위(동일한 `{}`)에 있기 때문에 더 이상 첫 번째 `my_number`를 볼 수 없습니다.
+
+그러나 만약 다른 블럭에 있다면 둘 다 확인할 수 있습니다. 예를 들면:
+
+```rust
+fn main() {
+    let my_number = 8; // 변수 타입은 i32 입니다.
+    println!("{}", my_number); // 8 을 출력합니다.
+    {
+        let my_number = 9.2; // 변수 타입은 f64 입니다. 이전의 my_number가 아닙니다(완전히 다른 것입니다)!
+        println!("{}", my_number) // 9.2 를 출력합니다.
+                                  // 그러나 shadowed my_number는 여기까지만 살아있습니다.
+                                  // 첫번째 my_number 도 여전히 살아있습니다!
+    }
+    println!("{}", my_number); // 8 을 출력합니다.
+}
+```
+
+따라서 변수를 shadowing 할 때 변수를 파괴하지 않습니다. 단지 이전 변수를 **차단** 하게 됩니다.
+
+그렇다면 shadowing을 장점은 무엇일까요? Shadowing은 변수를 많이 변경해야 할 때 유용합니다. 변수를 사용해서 많은 간단한 수학 연산을 수행하고 싶다는 상상을 해보세요:
+
+```rust
+fn times_two(number: i32) -> i32 {
+    number * 2
+}
+
+fn main() {
+    let final_number = {
+        let y = 10;
+        let x = 9; // x 는 9로 시작합니다.
+        let x = times_two(x); // shadow 된 새로운 x: 18
+        let x = x + y; // shadow 된 새로운 x: 28
+        x // x 반환: final_number 는 이제 x 값을 가지게 됩니다.
+    };
+    println!("The number is now: {}", final_number)
+}
+```
+
+Shadowing이 없으면 x에 대해 신경쓰지 않으려해도 다른 이름을 생각해야 합니다:
+
+```rust
+fn times_two(number: i32) -> i32 {
+    number * 2
+}
+
+fn main() {
+    // Shadowing 없이 Rust를 사용하는 척합니다.
+    let final_number = {
+        let y = 10;
+        let x = 9; // x 는 9로 시작합니다.
+        let x_twice = times_two(x); // x 를 위한 두번째 변수명입니다.
+        let x_twice_and_y = x_twice + y; // x 를 위한 세번째 변수명입니다!
+        x_twice_and_y // Shadowing이 없어서 너무 나쁩니다. x 를 사용할 수 있었을텐데요.
+    };
+    println!("The number is now: {}", final_number)
+}
+```
+
+일반적으로 Rust는 shadowing을 볼 수 있습니다. 빠르게 변수를 가져와서 무언가를 수행하고 다른 작업을 다시 수행할 경우에 일어납니다. 그리고, 보통은 그다지 신경쓰지 않는 빠른 변수에 사용합니다.
