@@ -40,8 +40,8 @@ Rust는 새로운 언어지만 이미 아주 인기가 있습니다. 그 인기�
     - [부동소수](#부동소수)
   - ['Hello, world!' 출력하기](#hello-world-출력하기)
     - [변수 선언과 코드 블럭](#변수-선언과-코드-블럭)
-  - [Display and debug](#display-and-debug)
-    - [Smallest and largest numbers](#smallest-and-largest-numbers)
+  - [디스플레이와 디버그](#디스플레이와-디버그)
+    - [가작 작은 숫자와 가장 큰 숫자](#가작-작은-숫자와-가장-큰-숫자)
   - [Mutability (changing)](#mutability-changing)
     - [Shadowing](#shadowing)
   - [The stack, the heap, and pointers](#the-stack-the-heap-and-pointers)
@@ -661,3 +661,82 @@ fn main() {
 ```
 
 그렇다면 왜 `{}`가 아닌 `{:?}`를 사용했을까요? 다음 챕터에서 그것에 대해 이야기할 예정입니다.
+
+## 디스플레이와 디버그
+**[See this chapter on YouTube](https://youtu.be/jd3pC248c0o)**
+
+Rust의 간단한 변수는 `println!` 내부의 `{}`를 사용하여 출력할 수 있습니다. 그러나 일부 변수는 할 수 없고, 이를 위해서는 **디버그 출력** 이 필요합니다. 디버그 출력은 일반적으로 프로그래머에게 더 많은 정보를 보여주기 위해 사용됩니다. 디버그는 도움이 되는 추가 정보를 출력하기 때문에 보기에 좋지 않을 수도 있습니다.
+
+`{}`가 아니라 `{:?}`가 필요한지 어떻게 알 수 있을까요? 컴파일러가 아래 예제와 같이 알려줍니다:
+
+```rust
+fn main() {
+    let doesnt_print = ();
+    println!("This will not print: {}", doesnt_print); // ⚠️
+}
+```
+
+위 코드를 실행시키면 컴파일러는 아래와 같이 알려줍니다:
+
+```text
+error[E0277]: `()` doesn't implement `std::fmt::Display`
+ --> src\main.rs:3:41
+  |
+3 |     println!("This will not print: {}", doesnt_print);
+  |                                         ^^^^^^^^^^^^ `()` cannot be formatted with the default formatter
+  |
+  = help: the trait `std::fmt::Display` is not implemented for `()`
+  = note: in format strings you may be able to use `{:?}` (or {:#?} for pretty-print) instead
+  = note: required by `std::fmt::Display::fmt`
+  = note: this error originates in a macro (in Nightly builds, run with -Z macro-backtrace for more info)
+```
+
+위 결과는 많은 정보를 보여주고 있습니다. 그러나 중요한 부분은 `you may be able to use {:?} (or {:#?} for pretty-print) instead`입니다. 이는 `{:?}` 또는 `{:#?}`을 시도할 수 있다는 의미이고, 여기서 `{:#?}`는 "정돈된 출력(pretty printing)"이라고 불립니다. `{:?}`와 비슷하지만 더 많은 행에 걸쳐 다른 형식으로 출력됩니다.
+
+따라서 디스플레이(Display)는 `{}`로 출력하는 것을 의미하고 디버그(Debug)는 `{:?}`로 출력하는 것을 의미합니다.
+
+한 가지 더 말하자면, 줄 바꿈을 원하지 않을 때엔 `ln` 없이 `print!`를 사용할 수 있습니다.
+
+```rust
+fn main() {
+    print!("This will not print a new line");
+    println!(" so this will be on the same line");
+}
+```
+
+위 예제는 `This will not print a new line so this will be on the same line`를 출력합니다.
+
+### 가작 작은 숫자와 가장 큰 숫자
+
+만약 가장 작은 숫자와 가장 큰 숫자를 보려면, 타입 이름 뒤에 MIN 과 MAX 를 사용하면 됩니다:
+
+```rust
+fn main() {
+    println!("The smallest i8 is {} and the biggest i8 is {}.", i8::MIN, i8::MAX); // 힌트: std::i8::MIN 출력은 "표준 라이브러리의 i8 섹션 내부의 MIN을 출력한다"라는 것을 의미합니다.
+    println!("The smallest u8 is {} and the biggest u8 is {}.", u8::MIN, u8::MAX);
+    println!("The smallest i16 is {} and the biggest i16 is {}.", i16::MIN, i16::MAX);
+    println!("The smallest u16 is {} and the biggest u16 is {}.", u16::MIN, u16::MAX);
+    println!("The smallest i32 is {} and the biggest i32 is {}.", i32::MIN, i32::MAX);
+    println!("The smallest u32 is {} and the biggest u32 is {}.", u32::MIN, u32::MAX);
+    println!("The smallest i64 is {} and the biggest i64 is {}.", i64::MIN, i64::MAX);
+    println!("The smallest u64 is {} and the biggest u64 is {}.", u64::MIN, u64::MAX);
+    println!("The smallest i128 is {} and the biggest i128 is {}.", i128::MIN, i128::MAX);
+    println!("The smallest u128 is {} and the biggest u128 is {}.", u128::MIN, u128::MAX);
+
+}
+```
+
+위 예제는 아래와 같이 출력됩니다:
+
+```text
+The smallest i8 is -128 and the biggest i8 is 127.
+The smallest u8 is 0 and the biggest u8 is 255.
+The smallest i16 is -32768 and the biggest i16 is 32767.
+The smallest u16 is 0 and the biggest u16 is 65535.
+The smallest i32 is -2147483648 and the biggest i32 is 2147483647.
+The smallest u32 is 0 and the biggest u32 is 4294967295.
+The smallest i64 is -9223372036854775808 and the biggest i64 is 9223372036854775807.
+The smallest u64 is 0 and the biggest u64 is 18446744073709551615.
+The smallest i128 is -170141183460469231731687303715884105728 and the biggest i128 is 170141183460469231731687303715884105727.
+The smallest u128 is 0 and the biggest u128 is 340282366920938463463374607431768211455.
+```
