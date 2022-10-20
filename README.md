@@ -1212,7 +1212,6 @@ SEOUL--------------------TOKYO
 ## 문자열
 **[See this chapter on YouTube](https://youtu.be/pSyaGzGg26o)**
 
-Rust has two main types of strings: `String` and `&str`. What is the difference?
 Rust에는 두 종류의 문자열 타입이 있습니다: `String`과 `&str`. 차이점은 무엇일까요?
 
 - `&str`은 단순한 문자열입니다. `let my_variable = "Hello, world!"`라고 작성하면 `&str`이 생성됩니다. `&str`은 매우 빠릅니다.
