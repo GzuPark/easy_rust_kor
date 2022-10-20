@@ -51,7 +51,7 @@ Rust는 새로운 언어지만 이미 아주 인기가 있습니다. 그 인기�
   - [참조에 대해 더 알아보기](#참조에-대해-더-알아보기)
   - [가변 참조](#가변-참조)
     - [Shadowing 다시 살펴보기](#shadowing-다시-살펴보기)
-  - [Giving references to functions](#giving-references-to-functions)
+  - [함수에 참조 전달하기](#함수에-참조-전달하기)
   - [Copy types](#copy-types)
     - [Variables without values](#variables-without-values)
   - [Collection types](#collection-types)
@@ -1496,3 +1496,106 @@ fn main() {
     println!("{}, {}", country_ref, country); // country_ref는 여전히 String::from("Austria")의 데이터를 참조하고 있습니다.
 }
 ```
+
+## 함수에 참조 전달하기
+**See this chapter on YouTube: [immutable references](https://youtu.be/mKWXt9YTavc) and [mutable references](https://youtu.be/kJV1wIvAbyk)**
+
+참조는 함수에 아주 유용합니다. Rust에서 값에 대한 규칙은 다음과 같습니다: 값은 한 owner(소유자)만 가질 수 있습니다.
+
+아래 코드는 동작하지 않을 겁니다:
+
+```rust
+fn print_country(country_name: String) {
+    println!("{}", country_name);
+}
+
+fn main() {
+    let country = String::from("Austria");
+    print_country(country); // "Austria"를 출력합니다.
+    print_country(country); // ⚠️ 재밌네요, 다시 해봅시다!
+}
+```
+
+이는 `country`가 소멸되었기 때문에 동작하지 않습니다. 과정은 다음과 같습니다:
+
+- 1 단계: `country`라는 `String`을 생성합니다. `country`가 소유자입니다.
+- 2 단계: `country`를 `print_country`에 전달합니다. `print_country`에는 `->`가 없으므로 아무것도 반환하지 않습니다. `print_country`가 끝나면 이제 `String`은 소멸됩니다.
+- 3 단계: `print_country`에 `country`를 전달하려 했지만 이미 전달한 후입니다. 더 이상 전달해줄 `country`가 없습니다.
+
+`print_country`가 `String`을 되돌려 줄 수 있지만 약간 어색합니다.
+
+```rust
+fn print_country(country_name: String) -> String {
+    println!("{}", country_name);
+    country_name // 여기서 반환해줍니다.
+}
+
+fn main() {
+    let country = String::from("Austria");
+    let country = print_country(country); // String을 되돌려 받으려면 let을 사용해야 합니다.
+    print_country(country);
+}
+```
+
+결과는 다음과 같습니다:
+
+```text
+Austria
+Austria
+```
+
+이 문제를 해결하기 위한 훨씬 더 좋은 방법은 `&`을 추가하는 것입니다.
+
+```rust
+fn print_country(country_name: &String) {
+    println!("{}", country_name);
+}
+
+fn main() {
+    let country = String::from("Austria");
+    print_country(&country); // "Austria"를 출력합니다.
+    print_country(&country); // 재밌네요, 다시 해봅시다!
+}
+```
+
+`print_country()`는 `String`에 대한 참조인 `&String`을 가져오는 함수입니다: 또한, `&country`를 생성하여 `country`에 대한 참조를 제공합니다. "당신은 그것을 볼 수 있지만 난 계속 유지할 겁니다"라고 말하고 있습니다.
+
+가변 참조로 비슷한 작업을 해보겠습니다. 다음은 가변 참조를 사용하는 함수의 예시입니다.
+
+```rust
+fn add_hungary(country_name: &mut String) { // 우선 함수가 가변 참조를 받는다고 작성합니다.
+    country_name.push_str("-Hungary"); // push_str()은 String에 &str을 추가합니다.
+    println!("Now it says: {}", country_name);
+}
+
+fn main() {
+    let mut country = String::from("Austria");
+    add_hungary(&mut country); // 또한 가변 참조를 전달해줘야 합니다.
+}
+```
+
+위 결과는 `Now it says: Austria-Hungary`를 출력합니다.
+
+결론적으로:
+
+- `fn function_name(variable: String)`은 `String`을 가져와서 소유합니다. 아무 것도 반환하지 않으면 변수는 함수 내에서 소멸합니다.
+- `fn function_name(variable: &String)`은 `String`을 빌려서 볼 수 있습니다.
+- `fn function_name(variable: &mut String)`은 `String`을 빌려서 변경할 수 있습니다.
+
+다음은 가변 참조처럼 보이지만 다른 예시입니다.
+
+```rust
+fn main() {
+    let country = String::from("Austria"); // country는 불변입니다만 Austria-Hungary를 출력할겁니다. 어떻게 할까요?
+    adds_hungary(country);
+}
+
+fn adds_hungary(mut country: String) { // 방법은 다음과 같습니다: adds_hungary는 String을 가져와 가변성을 가진다고 선언해줍니다!
+    country.push_str("-Hungary");
+    println!("{}", country);
+}
+```
+
+이것이 어떻게 가능할까요? `mut country`가 참조가 아니기 때문입니다: `adds_hungray`는 현재 `country`를 소유하고 있지 않습니다. (기억하세요, `&String`이 아니라 `String`을 전달받습니다). `adds_hungary`를 호출하는 순간 전체 소유자가 됩니다. `country`는 더 이상 `String::from("Austria")`와 관련이 없습니다. 따라서 `add_hungary`는 `country`를 가변성을 가진 것으로 간주할 수 있으며 그렇게 하는 것이 안전합니다.
+
+이전 챕터에서 직원 파워포인트와 매니저 상황을 기억하시나요? 이 상황에서는 직원이 매니저에게 컴퓨터 전체를 이관해주는 것과 같습니다. 그 직원이 다시는 그것을 만지지 않을 것이므로 매니저는 자신이 원하는 모든 것을 할 수 있습니다.
