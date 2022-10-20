@@ -56,6 +56,7 @@ Rust는 새로운 언어지만 이미 아주 인기가 있습니다. 그 인기�
     - [값이 없는 변수](#값이-없는-변수)
   - [Collection 타입](#collection-타입)
     - [배열](#배열)
+  - [벡터](#벡터)
 
 # Part 1 - 브라우저에서의 Rust
 
@@ -1804,3 +1805,125 @@ fn main() {
 그래서 `[0..2]`는 첫번째 인덱스와 두번째 인덱스를(0과 1) 의미합니다. 혹은 "0번 그리고 1번" 인덱스라고 부를 수 있씁니다. 2번 인덱스를 의미하는 세번째 항목은 가지고 있지 않습니다.
 
 또한 **inclusive(포함)** 하는 범위를 가질 수 있습니다, 다시 말해 마지막 숫자도 포함시키는 것을 말합니다. 그렇게 하기 위해서는 `=`를 추가하여 `..` 대신 `..=`를 사용합니다. 따라서 첫번째, 두번째, 세번째 항목을 원한다면 `[0..2]` 대신 `[0..=2]`를 사용하면 됩니다.
+
+## 벡터
+**[See this chapter on YouTube](https://youtu.be/Eh-DsRnDKmw)**
+
+`&str`과 `String`이 있는 것처럼 Rust에는 배열과 벡터가 있습니다. 배열은 더 적은 기능으로 더 빠르고, 벡터는 더 많은 기능을 가지면서 더 느립니다. (물론 Rust는 항상 매우 빠르므로 벡터가 느린게 아니라 배열보다 느릴 뿐입니다.) 타입은 `Vec`으로 작성되고, 그냥 "vec"이라고 부를 수도 있습니다.
+
+벡터를 선언하는 방법은 크게 두 가지가 있씁니다. 하나는 `new`를 사용하는 `String`과 비슷합니다:
+
+```rust
+fn main() {
+    let name1 = String::from("Windy");
+    let name2 = String::from("Gomesy");
+
+    let mut my_vec = Vec::new();
+    // 만약 지금 프로그램을 실행하면 컴파일러가 오류를 발생시킵니다.
+    // 컴파일러가 vec의 타입을 모르니까요.
+
+    my_vec.push(name1); // 이젠 컴파일러가 알고 있습니다: Vec<String> 입니다.
+    my_vec.push(name2);
+}
+```
+
+`Vec`에는 항상 내부에 다른 것이 있고, 그것이 `<>`(꺾쇠 괄호)의 용도입니다. `Vec<String>`은 하나 이상의 `String`이 있는 벡터입니다. 내부에 더 많은 타입을 가질 수도 있씁니다. 가령:
+
+- `Vec<(i32, i32)>` 이것은 각 항목이 튜플인 `(i32, i32)`인 `Vec`입니다.
+- `Vec<Vec<String>>` `String` 타입의 `Vec`을 가지고 있는 `Vec`입니다. 예를 들어 좋아하는 책을 `Vec<String>`으로 저장하고 싶다고 해보겠습니다. 그런 다음 다른 책으로 다시 실행하고 또 다른 `Vec<String>`을 얻을 수 있습니다. 두 책을 모두 보관하기 위해 다른 `Vec`에 넣을 경우 `Vec<Vec<String>>`이 됩니다.
+
+Rust가 타입을 결정하도록 하기 위해 `.push()`를 사용하는 대신 타입을 선언할 수 있습니다.
+
+```rust
+fn main() {
+    let mut my_vec: Vec<String> = Vec::new(); // 컴파일러는 타입을 알고 있습니다.
+                                              // 따라서 에러가 발생하지 않습니다.
+}
+```
+
+벡터의 항목은 타입이 같아야 된다는 것을 볼 수 있습니다.
+
+벡터를 만드는 또 다른 쉬운 방법은 `vec!` 매크로를 사용하는 것입니다. 아래는 배열 선언처럼 보이지만 그 앞에 `vec!`이 있습니다.
+
+```rust
+fn main() {
+    let mut my_vec = vec![8, 10, 10];
+}
+```
+
+타입은 `Vec<i32>`입니다. "`i32`의 `vec`"라고 부를 수 있습니다. 그리고, `Vec<String>`은 "문자열의 `vec`", `Vec<Vec<String>>`을 "문자열의 `Vec`의 `Vec`"이라고 할 수 있습니다.
+
+배열에서처럼 벡터도 슬라이스 할 수 있습니다.
+
+```rust
+fn main() {
+    let vec_of_ten = vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    // vec!을 추가한 것을 제외하고는 모든 것이 배열과 동일합니다.
+    let three_to_five = &vec_of_ten[2..5];
+    let start_at_two = &vec_of_ten[1..];
+    let end_at_five = &vec_of_ten[..5];
+    let everything = &vec_of_ten[..];
+
+    println!("Three to five: {:?},
+start at two: {:?}
+end at five: {:?}
+everything: {:?}", three_to_five, start_at_two, end_at_five, everything);
+}
+```
+
+`vec`은 배열보다 느리기 때문에 몇 가지 방법을 사용하여 더 빠르게 만들 수 있습니다. `vec`에는 벡터에 주어진 공간을 의미하는 **capacity(용량)** 이 있습니다. 벡ㄴ터에 새 항목을 밀어 넣으면 용량에 점점 가까워집니다. 그런 다음 용량을 초과하면 용량이 두 배로 늘어나고 항목을 새 공간에 복사합니다. 이것을 재할당이라고 부릅니다. 항목을 추가할 때 벡터의 용량을 확인하기 위해 `.capacity()`라는 메소드를 사용합니다.
+
+예를 들면:
+
+```rust
+fn main() {
+    let mut num_vec = Vec::new();
+    println!("{}", num_vec.capacity()); // 항목 0개: 0을 출력합니다.
+    num_vec.push('a'); // 문자 하나 추가
+    println!("{}", num_vec.capacity()); // 항목 1개: 4를 출력합니다. 항목이 1개인 Vec은 항상 용량이 4로 시작합니다.
+    num_vec.push('a'); // 하나 더 추가
+    num_vec.push('a'); // 하나 더 추가
+    num_vec.push('a'); // 하나 더 추가
+    println!("{}", num_vec.capacity()); // 항목 4개: 여전히 4를 출력합니다.
+    num_vec.push('a'); // 하나 더 추가
+    println!("{}", num_vec.capacity()); // 8을 출력합니다. 5개의 항목이 있지만 공간을 만들기 위해 4에서 8로 두 배 늘렸습니다.
+}
+```
+
+아래와 같이 결과를 확인할 수 있습니다:
+
+```text
+0
+4
+4
+8
+```
+
+따라서 이 벡터에서는 0에서 4, 4에서 8이라는 두 번의 재할당이 있습니다. 우리는 더 빠르게 만들 수 있습니다:
+
+```rust
+fn main() {
+    let mut num_vec = Vec::with_capacity(8); // 용량을 8로 지정합니다.
+    num_vec.push('a'); // 문자 하나 추가
+    println!("{}", num_vec.capacity()); // 8을 출력합니다.
+    num_vec.push('a'); // 하나 더 추가
+    println!("{}", num_vec.capacity()); // 8을 출력합니다.
+    num_vec.push('a'); // 하나 더 추가
+    println!("{}", num_vec.capacity()); // 8을 출력합니다.
+    num_vec.push('a'); // 하나 더 추가
+    num_vec.push('a'); // 하나 더 추가 // 이제 5개의 항목을 가지고 있습니다.
+    println!("{}", num_vec.capacity()); // 여전히 8을 출력합니다.
+}
+```
+
+이 벡터에는 0번의 재할당이 있으므로 더 좋습니다. 그래서 만약 필요한 항목의 수를 알고 있다면 `Vec::with_capacity()`를 사용하여 더 빠르게 만들 수 있습니다.
+
+`.into()`를 사용하여 `&str`을 `String`으로 만들 수 있다는 점을 말했습니다. 역시 배열을 `Vec`으로 만드는 데 사용할 수도 있습니다. `.into()`에게 `Vec`을 원한다고 말해야 되지만 `Vec`의 타입을 선택할 필요는 없습니다. 선택하지 않으려면 `Vec<_>`이라고 쓰면 됩니다.
+
+```rust
+fn main() {
+    let my_vec: Vec<u8> = [1, 2, 3].into();
+    let my_vec2: Vec<_> = [9, 0, 10].into(); // Vec<_>은 "나를 위해 Vec의 타입을 선택해주세요"를 의미합니다.
+                                             // Rust는 Vec<i32> 타입을 선택할 것입니다.
+}
+```
