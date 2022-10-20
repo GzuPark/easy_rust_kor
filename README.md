@@ -47,7 +47,7 @@ Rust는 새로운 언어지만 이미 아주 인기가 있습니다. 그 인기�
   - [스택, 힙, 그리고 포인터](#스택-힙-그리고-포인터)
   - [출력에 대해 더 알아보기](#출력에-대해-더-알아보기)
   - [문자열](#문자열)
-  - [const and static](#const-and-static)
+  - [const 와 static](#const-와-static)
   - [More on references](#more-on-references)
   - [Mutable references](#mutable-references)
     - [Shadowing again](#shadowing-again)
@@ -1319,3 +1319,17 @@ fn main() {
 ```
 
 그리고 이제 `String`이 되었습니다.
+
+## const 와 static
+**[See this chapter on YouTube](https://youtu.be/Ky3HqkWUcI0)**
+
+값을 선언하는 방법은 `let`뿐만 아니라 두 가지 다른 방법이 있습니다. `const`와 `static`입니다. 또한, Rust는 타입 추론을 사용하지 않을 겁니다: 타입을 명시해줘야 합니다. 변하지 않는 값을 위한 것입니다(`const`는 상수를 의미합니다). 차이는 다음과 같습니다:
+
+- `const`는 병경되지 않는 값에 대한 것으로 이름은 사용될 때 값으로 교체되며,
+- `static`은 `const`와 비슷하지만 메모리 위치가 고정되어 있고 전역 변수같이 동작할 수 있습니다.
+
+위 두가지는 거의 동일합니다. Rust 프로그래머들은 거의 항상 `const`를 사용합니다.
+
+모두 대문자로 작성하고, 전체 프로그램에서 사용할 수 있도록  일반적으로 `main` 외부에 작성합니다.
+
+두 가지 예시: `const NUMBER_OF_MONTHS: u32 = 12;` 그리고 `static SEASONS: [&str; 4] = ["Spring", "Summer", "Fall", "Winter"];`
