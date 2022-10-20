@@ -48,7 +48,7 @@ Rust는 새로운 언어지만 이미 아주 인기가 있습니다. 그 인기�
   - [출력에 대해 더 알아보기](#출력에-대해-더-알아보기)
   - [문자열](#문자열)
   - [const 와 static](#const-와-static)
-  - [More on references](#more-on-references)
+  - [참조에 대해 더 알아보기](#참조에-대해-더-알아보기)
   - [Mutable references](#mutable-references)
     - [Shadowing again](#shadowing-again)
   - [Giving references to functions](#giving-references-to-functions)
@@ -1332,3 +1332,40 @@ fn main() {
 모두 대문자로 작성하고, 전체 프로그램에서 사용할 수 있도록  일반적으로 `main` 외부에 작성합니다.
 
 두 가지 예시: `const NUMBER_OF_MONTHS: u32 = 12;` 그리고 `static SEASONS: [&str; 4] = ["Spring", "Summer", "Fall", "Winter"];`
+
+## 참조에 대해 더 알아보기
+**[See this chapter on YouTube](https://youtu.be/R13sQ8SNoEQ)**
+
+참조는 Rust에서 매우 중요합니다. Rust는 참조를 사용하여 모든 메모리 접근이 안전한지 확인합니다. 우리는 참조를 생성하기 위해 `&`을 사용한다는 것을 알고 있습니다.
+
+```rust
+fn main() {
+    let country = String::from("Austria");
+    let ref_one = &country;
+    let ref_two = &country;
+
+    println!("{}", ref_one);
+}
+```
+
+위 예제는 `Austria`을 출력합니다.
+
+위 코드에서 `country`는 `String`입니다. 그런 다음 `county`에 대한 두 개의 참조를 생성했습니다. 두 참조는 "`String`에 대한 참조"라고 말하는 `&String` 타입을 가지고 있습니다. 그렇다면 우리는 `country`에 대한 3개 참조 혹은 100개 참조를 생성할 수 있으며 문제가 없을겁니다.
+
+그러나 아래와 같은 문제가 있습니다:
+
+```rust
+fn return_str() -> &str {
+    let country = String::from("Austria");
+    let country_ref = &country;
+    country_ref // ⚠️
+}
+
+fn main() {
+    let country = return_str();
+}
+```
+
+`return_str()` 함수는 `String`을 생성한 다음 `String`에 대한 참조를 생성합니다. 그런 다음 참조를 반환하려고 합니다. 그러나 문자열 `country`는 함수 내부에서만 생성되고 소멸됩니다. 변수가 사라지면 컴퓨터는 메모리를 정리하고 다른 용도로 사용합니다. 따라서 함수가 끝난 후에 `country_ref`는 이미 사라진 메모리를 참조하고 있고, 그건 좋지 않은 상황입니다. Rust는 우리가 메모리에서 실수하는 것을 방지해줍니다.
+
+이는 우리가 위에서 이야기한 "owned (소유)" 타입에 대한 중요한 부분입니다. `String`을 소유하고 있기 때문에 다음으로 전달할 수 있습니다. 그러나 `&String`은 `String`이 소멸되면 소멸되므로 "ownership (소유권)"을 전달하지 못합니다.
