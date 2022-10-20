@@ -57,6 +57,7 @@ Rust는 새로운 언어지만 이미 아주 인기가 있습니다. 그 인기�
   - [Collection 타입](#collection-타입)
     - [배열](#배열)
   - [벡터](#벡터)
+  - [튜플](#튜플)
 
 # Part 1 - 브라우저에서의 Rust
 
@@ -1927,3 +1928,99 @@ fn main() {
                                              // Rust는 Vec<i32> 타입을 선택할 것입니다.
 }
 ```
+
+## 튜플
+**[See this chapter on YouTube](https://youtu.be/U67Diy6SlTg)**
+
+Rust의 튜플은 `()`를 사용합니다. 실제로 함수의 *아무것도 없는* 빈 튜플을 의미하지 않기 때문에 우리는 이미 많은 빈 튜플을 봐왔습니다:
+
+```text
+fn do_something() {}
+```
+
+위는 실제로 아래의 짧은 형태입니다:
+
+```text
+fn do_something() -> () {}
+```
+
+함수는 아무것도 얻지 못하고(빈 튜플), 아무것도 반환하지 않습니다(빈 튜플). 그래서 우리는 이미 튜플을 많이 사용하고 있습니다. 함수에서 아무것도 반환하지 않으면 실제로 빈 튜플을 반환합니다.
+
+```rust
+fn just_prints() {
+    println!("I am printing"); // ;을 추가하는 것은 빈 튜플을 반환한다는 의미입니다.
+}
+
+fn main() {}
+```
+
+그러나 튜플은 많은 것을 담을 수 있고 다른 타입도 담을 수 있습니다. 튜플 내부의 항목도 0, 1, 2 등의 숫자로 인덱싱할 수 있습니다. 그러나 접근하려면 `[]` 대신 `.`을 사용합니다. 여러 타입을 단일 튜플에 넣어봅시다.
+
+```rust
+fn main() {
+    let random_tuple = ("Here is a name", 8, vec!['a'], 'b', [8, 9, 10], 7.7);
+    println!(
+        "Inside the tuple is: First item: {:?}
+Second item: {:?}
+Third item: {:?}
+Fourth item: {:?}
+Fifth item: {:?}
+Sixth item: {:?}",
+        random_tuple.0,
+        random_tuple.1,
+        random_tuple.2,
+        random_tuple.3,
+        random_tuple.4,
+        random_tuple.5,
+    )
+}
+```
+
+이는 아래와 같이 출력됩니다:
+
+```text
+Inside the tuple is: First item: "Here is a name"
+Second item: 8
+Third item: ['a']
+Fourth item: 'b'
+Fifth item: [8, 9, 10]
+Sixth item: 7.7
+```
+
+위 튜플은 `(&str, i32, Vec<char>, char, [i32; 3], f64)` 타입을 가집니다.
+
+
+튜플을 사용하여 여러 변수를 만들 수 있습니다. 아래 코드를 살펴보세요:
+
+```rust
+fn main() {
+    let str_vec = vec!["one", "two", "three"];
+}
+```
+
+`str_vec`은 3개의 아이템을 가지고 있습니다. 만약 우리가 꺼내고 싶다면? 그것이 바로 우리가 튜플을 사용할 수 있는 경우입니다.
+
+```rust
+fn main() {
+    let str_vec = vec!["one", "two", "three"];
+
+    let (a, b, c) = (str_vec[0], str_vec[1], str_vec[2]); // a, b, c로 부릅니다.
+    println!("{:?}", b);
+}
+```
+
+`"two"`라고 출력하는데 과연 `b`가 무엇일까요. 이것을 *destructuring(비구조화)* 라고 부릅니다. 처음에는 변수가 구조체 내부에 있지만 구조체 안에 없는 `a`, `b`, `c`를 만들었기 때문입니다.
+
+만약 비구조화를 해야하지만 변수를 얻고 싶지 않다면, `_`를 사용하면 됩니다.
+
+```rust
+fn main() {
+    let str_vec = vec!["one", "two", "three"];
+
+    let (_, _, variable) = (str_vec[0], str_vec[1], str_vec[2]);
+}
+```
+
+`variable`이라는 변수만 생성하고 다른 변수를 위한 변수는 생성하지 않습니다.
+
+더 많은 collection 타입과 배열, 벡터, 튜플을 사용하는 더 많은 방법이 있습니다. 그 방법들에 대해서도 더 배울테지만 먼저 제어 흐름을 배울 예정입니다.
