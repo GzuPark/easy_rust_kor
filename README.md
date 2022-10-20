@@ -46,7 +46,7 @@ Rust는 새로운 언어지만 이미 아주 인기가 있습니다. 그 인기�
     - [Shadowing](#shadowing)
   - [스택, 힙, 그리고 포인터](#스택-힙-그리고-포인터)
   - [출력에 대해 더 알아보기](#출력에-대해-더-알아보기)
-  - [Strings](#strings)
+  - [문자열](#문자열)
   - [const and static](#const-and-static)
   - [More on references](#more-on-references)
   - [Mutable references](#mutable-references)
@@ -1208,3 +1208,114 @@ fn main() {
 |                            |
 SEOUL--------------------TOKYO
 ```
+
+## 문자열
+**[See this chapter on YouTube](https://youtu.be/pSyaGzGg26o)**
+
+Rust has two main types of strings: `String` and `&str`. What is the difference?
+Rust에는 두 종류의 문자열 타입이 있습니다: `String`과 `&str`. 차이점은 무엇일까요?
+
+- `&str`은 단순한 문자열입니다. `let my_variable = "Hello, world!"`라고 작성하면 `&str`이 생성됩니다. `&str`은 매우 빠릅니다.
+- `String`은 좀 더 복잡한 문자열입니다. 속도는 조금 더 느리지만 더 많은 기능을 가지고 있습니다. `String`은 힙에 데이터가 있는 포인터입니다.
+
+또한 `&str` 앞에는 `&`이 있는데 이는 `str`을 사용하기 위해서는 참조가 필요하기 때문입니다. 위에서 본 것처럼 스택은 크기를 알아야 하기 때문입니다. 그래서 우리는 크기를 알고 있는 문자열에 `&`를 붙이고 행복할 수 있습니다. 또한, `&`를 사용하여 `str`과 상호작용하기 때문에 소유하는 것이 아닙니다. 그러나 `String`은 *owned (소유된)* 형태입니다. 이 점이 왜 중요한지 곧 배우게 될 것입니다.
+
+`&str`과 `String` 모두 UTF-8 입니다. 예를 들어 다음과 같이 작성해봅니다:
+
+```rust
+fn main() {
+    let name = "서태지"; // 한국식 이름입니다. 아무런 문제가 없죠, 왜냐하면 &str 이 UTF-8 이기 때문입니다.
+    let other_name = String::from("Adrian Fahrenheit Țepeș"); // Ț 와 ș 도 UTF-8 이기 때문에 문제가 없습니다.
+}
+```
+
+`String::from("Adrian Fahrenheit Țepeș")`에서 보이는 것처럼 `&str`로 부터 `String`을 만드는 것이 쉽다는 것을 알 수 있습니다. 두 타입은 서로 다르지만 매우 밀접하게 관련되어 있습니다.
+
+UTF-8 덕분에 이모티콘도 쓸 수 있습니다.
+
+```rust
+fn main() {
+    let name = "😂";
+    println!("My name is actually {}", name);
+}
+```
+
+커맨드 라인에서 출력할 수 없는 경우 컴퓨터에서 `My name is actually 😂`를 출력을 해봅니다. 그러면 `My name is actually �`라고 보일것입니다. 그러나 Rust는 이모티콘이나 다른 Unicode에 문제가 없습니다.
+
+이해를 돕기 위해 `str`에 `&`을 사용하는 이유를 다시 한번 살펴보겠습니다.
+
+- `str`은 동적으로 크기가 변하는 타입입니다(동적 크기 변경 = 크기가 다를 수 있습니다). 예를 들어 "서태지"와 "Adrian Fahrenheit Țepeș"라는 이름은 같은 크기가 아닙니다:
+
+```rust
+fn main() {
+
+    println!("A String is always {:?} bytes. It is Sized.", std::mem::size_of::<String>()); // std::mem::size_of::<Type>() 은 타입의 bytes 크기를 반환합니다.
+    println!("And an i8 is always {:?} bytes. It is Sized.", std::mem::size_of::<i8>());
+    println!("And an f64 is always {:?} bytes. It is Sized.", std::mem::size_of::<f64>());
+    println!("But a &str? It can be anything. '서태지' is {:?} bytes. It is not Sized.", std::mem::size_of_val("서태지")); // std::mem::size_of_val() 은 변수의 bytes 크기를 반환합니다.
+    println!("And 'Adrian Fahrenheit Țepeș' is {:?} bytes. It is not Sized.", std::mem::size_of_val("Adrian Fahrenheit Țepeș"));
+}
+```
+
+위 예제는 아래와 같이 출력됩니다:
+
+```text
+A String is always 24 bytes. It is Sized.
+And an i8 is always 1 bytes. It is Sized.
+And an f64 is always 8 bytes. It is Sized.
+But a &str? It can be anything. '서태지' is 9 bytes. It is not Sized.
+And 'Adrian Fahrenheit Țepeș' is 25 bytes. It is not Sized.
+```
+
+이것이 `&`가 포인터를 만들고 Rust가 포인터의 크기를 알고 있기 때문에 `&`이 필요한 이유입니다. 따라서 포인터는 스택으로 이동합니다. 우리가 `str`을 쓴다면, Rust는 크기를 모르기 때문에 무엇을 해야할지 알 수 없습니다.
+
+
+
+`String`을 만드는 방법에 여러가지가 있습니다. 몇 가지를 확인합니다:
+
+- `String::from("This is the string text");`. 텍스트를 받아서 `String`을 생성하는 `String` 메소드입니다.
+- `"This is the string text".to_string()`. 문자열을 만드는 `&str` 메소드입니다.
+- `format!` 매크로. 출력 대신 문자열을 생성한다는 점을 제외하면 `println!`과 같습니다. 그래서 다음과 같이 할 수 있습니다:
+
+```rust
+fn main() {
+    let my_name = "Billybrobby";
+    let my_country = "USA";
+    let my_home = "Korea";
+
+    let together = format!(
+        "I am {} and I come from {} but I live in {}.",
+        my_name, my_country, my_home
+    );
+}
+```
+
+*together* 라는 문자열이 있지만 아직 출력하지 않았습니다.
+
+`String`을 만드는 또 다른 방법은 `.into()`이지만 `.into()`는 단지 `String`을 만들기 위한 것이 아니기 때문에 약간 다릅니다. 일부 타입은 `From`과 `.into()`를 사용하여 다른 타입으로 쉽게 변환할 수 있습니다. 그리고 만약 `From`이 있다면 `.into()` 또한 있을겁니다. `From`은 이미 타입을 알고 있기 때문에 더 명확합니다. `String::from("Some str")`은 `&str`로 부터 `String`을 말합니다. 그렇지만 때로는 `.into()`를 사용하면 컴파일러가 다음과 같이 알기 어려운 경우가 있습니다:
+
+```rust
+fn main() {
+    let my_string = "Try to make this a String".into(); // ⚠️
+}
+```
+
+`&str`로부터 생성되는 많은 타입이 존재하기 때문에 Rust는 당신이 원하는 타입을 알지 못합니다. "`&str`로 많은 것을 만들 수 있습니다. 어떤 것을 원하나요?"라고 말하고 있습니다.
+
+```text
+error[E0282]: type annotations needed
+ --> src\main.rs:2:9
+  |
+2 |     let my_string = "Try to make this a String".into();
+  |         ^^^^^^^^^ consider giving `my_string` a type
+```
+
+그래서 아래처럼 할 수 있습니다:
+
+```rust
+fn main() {
+    let my_string: String = "Try to make this a String".into();
+}
+```
+
+그리고 이제 `String`이 되었습니다.
