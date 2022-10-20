@@ -58,6 +58,7 @@ Rust는 새로운 언어지만 이미 아주 인기가 있습니다. 그 인기�
     - [배열](#배열)
   - [벡터](#벡터)
   - [튜플](#튜플)
+  - [제어 흐름](#제어-흐름)
 
 # Part 1 - 브라우저에서의 Rust
 
@@ -2024,3 +2025,265 @@ fn main() {
 `variable`이라는 변수만 생성하고 다른 변수를 위한 변수는 생성하지 않습니다.
 
 더 많은 collection 타입과 배열, 벡터, 튜플을 사용하는 더 많은 방법이 있습니다. 그 방법들에 대해서도 더 배울테지만 먼저 제어 흐름을 배울 예정입니다.
+
+## 제어 흐름
+**See this chapter on YouTube: [Part 1](https://youtu.be/UAymDOpv_us) and [Part 2](https://youtu.be/eqysTfiiQZs)**
+
+Control flow (제어 흐름)은 코드에 다양한 상황에서 수행할 작업을 지시하는 것을 의미합니다. 가장 간단한 제어 흐름은 `if`입니다.
+
+```rust
+fn main() {
+    let my_number = 5;
+    if my_number == 7 {
+        println!("It's seven");
+    }
+}
+```
+
+또한 `=`가 아니라 `==`를 사용한다는 점에 주의하세요. `==`는 비교, `=`는 *할당* (값을 제공)입니다. 또한, `if (my_number == 7)`가 아니라 `if my_number == 7`이라고 사용했습니다. Rust에서는 `if`에 괄호가 필요하지 않습니다.
+
+`else if`와 `else`는 더 많은 제어를 제공합니다:
+
+```rust
+fn main() {
+    let my_number = 5;
+    if my_number == 7 {
+        println!("It's seven");
+    } else if my_number == 6 {
+        println!("It's six")
+    } else {
+        println!("It's a different number")
+    }
+}
+```
+
+7 이나 6이 아니기 때문에 `It's a different number`가 출력됩니다.
+
+`&&` (and) 와 `||` (or) 를 사용하여 더 많은 조건을 추가할 수 있습니다.
+
+```rust
+fn main() {
+    let my_number = 5;
+    if my_number % 2 == 1 && my_number > 0 { // % 2 는 2로 나눈 후 나머지를 의미합니다.
+        println!("It's a positive odd number");
+    } else if my_number == 6 {
+        println!("It's six")
+    } else {
+        println!("It's a different number")
+    }
+}
+```
+
+2로 나누면 나머지가 1이 되고 0보다 큰 수이므로 `It's a positive odd number`가 출력됩니다.
+
+
+`if`, `else`, `else if`가 너무 많으면 읽기 어렵다는 점을 알고 있습니다. 이럴땐 대신 훨씬 깔끔하게 보이는 `match`를 사용할 수 있습니다. 그러나 가능한 모든 결과에 match(일치)시켜야 합니다. 예를 들어 다음은 동작하지 않습니다:
+
+```rust
+fn main() {
+    let my_number: u8 = 5;
+    match my_number {
+        0 => println!("it's zero"),
+        1 => println!("it's one"),
+        2 => println!("it's two"),
+        // ⚠️
+    }
+}
+```
+
+컴파일러는 아래와 같이 말할 것입니다:
+
+```text
+error[E0004]: non-exhaustive patterns: `3u8..=std::u8::MAX` not covered
+ --> src\main.rs:3:11
+  |
+3 |     match my_number {
+  |           ^^^^^^^^^ pattern `3u8..=std::u8::MAX` not covered
+```
+
+위 내용은 "0 에서 2 까지에 대해 말해줬지만 `u8`은 255까지 있습니다. 3은 어떻게 할까요? 4는요? 5는요?" 등등을 의미합니다. 따라서 "다른 모든 것"을 의미하는 `_`을 추가할 수 있습니다.
+
+```rust
+fn main() {
+    let my_number: u8 = 5;
+    match my_number {
+        0 => println!("it's zero"),
+        1 => println!("it's one"),
+        2 => println!("it's two"),
+        _ => println!("It's some other number"),
+    }
+}
+```
+
+이제 `It's some other number`를 출력합니다.
+
+`match`를 위해 기억해두세요:
+
+- `match`를 작성한 다음 `{}` 코드 블럭을 만듭니다.
+- 왼쪽에 *패턴* 을 쓰고 `=>` 굵은 화살표를 사용하여 일치할 때 수행할 작업을 지정합니다.
+- 각 라인을 "arm"이라고 부릅니다.
+- arm 사이에 쉼표를 넣어주세요 (세미콜론이 아닙니다).
+
+이제 match 되는 값을 선언할 수 있습니다:
+
+```rust
+fn main() {
+    let my_number = 5;
+    let second_number = match my_number {
+        0 => 0,
+        5 => 10,
+        _ => 2,
+    };
+}
+```
+
+`second_number` will be 10. Do you see the semicolon at the end? That is because, after the match is over, we actually told the compiler this: `let second_number = 10;`
+`second_number`는 10이 됩니다. 끝에 세미콜론이 보이세요? 이 match가 끝난 후 실제로 컴파일러에게 다음과 같이 말한겁니다: `let second_number = 10;`.
+
+
+더 복잡한 것도 match 시킬 수 있습니다. 이를 위해서는 튜플을 사용하면 됩니다.
+
+```rust
+fn main() {
+    let sky = "cloudy";
+    let temperature = "warm";
+
+    match (sky, temperature) {
+        ("cloudy", "cold") => println!("It's dark and unpleasant today"),
+        ("clear", "warm") => println!("It's a nice day"),
+        ("cloudy", "warm") => println!("It's dark but not bad"),
+        _ => println!("Not sure what the weather is."),
+    }
+}
+```
+
+`sky`와 `temperature`에 대해 "cloudy"와 "warm"이 일치하기 때문에 `It's dark but not bad`을 출력합니다.
+
+`match` 안에 `if`를 넣을 수도 있습니다. 이것을 "match guard (매치 가드)" 라고 부릅니다:
+
+```rust
+fn main() {
+    let children = 5;
+    let married = true;
+
+    match (children, married) {
+        (children, married) if married == false => println!("Not married with {} children", children),
+        (children, married) if children == 0 && married == true => println!("Married but no children"),
+        _ => println!("Married? {}. Number of children: {}.", married, children),
+    }
+}
+```
+
+위 예제는 `Married? true. Number of children: 5.`을 출력합니다.
+
+match에서 원하는 만큼 `_`을 사용할 수 있습니다. 이 색상 match에서는 세 가지가 있지만 한 번에 하나만 확인합니다.
+
+```rust
+fn match_colours(rbg: (i32, i32, i32)) {
+    match rbg {
+        (r, _, _) if r < 10 => println!("Not much red"),
+        (_, b, _) if b < 10 => println!("Not much blue"),
+        (_, _, g) if g < 10 => println!("Not much green"),
+        _ => println!("Each colour has at least 10"),
+    }
+}
+
+fn main() {
+    let first = (200, 0, 0);
+    let second = (50, 50, 50);
+    let third = (200, 50, 0);
+
+    match_colours(first);
+    match_colours(second);
+    match_colours(third);
+
+}
+```
+
+위 예제는 아래와 같이 출력합니다:
+
+```text
+Not much blue
+Each colour has at least 10
+Not much green
+```
+
+또한 첫번째 예시에서 `Not much blue`만 출력했기 때문에 `match` 문이 동작하는 방식을 보여주고 있습니다. 그러나 `first`도 녹색이 많지 않습니다. `match` 문은 일치하는 항목을 찾으면 항상 중지되고 나머지는 확인하지 않습니다. 이는 잘 컴파일되지만 원하는 코드가 아닌 코드의 좋은 예시입니다.
+
+이것을 고치기 위해 정말 큰 `match` 문을 만들 수 있지만 아마도 `for` 반복문을 사용하는 것이 더 좋을겁니다. 우리는 이제 곧 반복문에 대해 이야기할 것입니다.
+
+`match`는 동일한 타입을 반환해야 합니다. 따라서 아래는 실행되지 않습니다:
+
+```rust
+fn main() {
+    let my_number = 10;
+    let some_variable = match my_number {
+        10 => 8,
+        _ => "Not ten", // ⚠️
+    };
+}
+```
+
+컴파일러는 아래와 같이 알려줍니다:
+
+```text
+error[E0308]: `match` arms have incompatible types
+  --> src\main.rs:17:14
+   |
+15 |       let some_variable = match my_number {
+   |  _________________________-
+16 | |         10 => 8,
+   | |               - this is found to be of type `{integer}`
+17 | |         _ => "Not ten",
+   | |              ^^^^^^^^^ expected integer, found `&str`
+18 | |     };
+   | |_____- `match` arms have incompatible types
+```
+
+아래는 같은 이유로 동작하지 않습니다:
+
+```rust
+fn main() {
+    let some_variable = if my_number == 10 { 8 } else { "something else "}; // ⚠️
+}
+```
+
+그렇지만 아래는 `match`가 아니므로 매번 다른 `let` 문이 있기 때문에 잘 동작합니다:
+
+```rust
+fn main() {
+    let my_number = 10;
+
+    if my_number == 10 {
+        let some_variable = 8;
+    } else {
+        let some_variable = "Something else";
+    }
+}
+```
+
+또한 `@`를 사용하여 `match` 표현식의 값에 이름을 지정한 다음 사용할 수 있습니다. 아래 예에서는 함수 안에서 `i32` 타입 입력값을 전달받아 match 시킵니다. 만약 4 또는 13이라면 `println!` 문에서 해당 숫자를 사용하려고 합니다. 그렇지 않다면 사용할 필요가 없습니다.
+
+```rust
+fn match_number(input: i32) {
+    match input {
+    number @ 4 => println!("{} is an unlucky number in China (sounds close to 死)!", number),
+    number @ 13 => println!("{} is unlucky in North America, lucky in Italy! In bocca al lupo!", number),
+    _ => println!("Looks like a normal number"),
+    }
+}
+
+fn main() {
+    match_number(50);
+    match_number(13);
+    match_number(4);
+}
+```
+
+위 예제는 아래와 같이 출력됩니다:
+
+```text
+Looks like a normal number
+13 is unlucky in North America, lucky in Italy! In bocca al lupo!
+4 is an unlucky number in China (sounds close to 死)!
+```
