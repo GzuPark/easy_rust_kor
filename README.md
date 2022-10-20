@@ -54,95 +54,8 @@ Rust는 새로운 언어지만 이미 아주 인기가 있습니다. 그 인기�
   - [함수에 참조 전달하기](#함수에-참조-전달하기)
   - [복사 타입](#복사-타입)
     - [값이 없는 변수](#값이-없는-변수)
-  - [Collection types](#collection-types)
-    - [Arrays](#arrays)
-  - [Vectors](#vectors)
-  - [Tuples](#tuples)
-  - [Control flow](#control-flow)
-  - [Structs](#structs)
-  - [Enums](#enums)
-    - [Enums to use multiple types](#enums-to-use-multiple-types)
-  - [Loops](#loops)
-  - [Implementing structs and enums](#implementing-structs-and-enums)
-  - [Destructuring](#destructuring)
-  - [References and the dot operator](#references-and-the-dot-operator)
-  - [Generics](#generics)
-  - [Option and Result](#option-and-result)
-    - [Option](#option)
-    - [Result](#result)
-  - [Other collections](#other-collections)
-    - [HashMap (and BTreeMap)](#hashmap-and-btreemap)
-    - [HashSet and BTreeSet](#hashset-and-btreeset)
-    - [BinaryHeap](#binaryheap)
-    - [VecDeque](#vecdeque)
-  - [The ? operator](#the--operator)
-    - [When panic and unwrap are good](#when-panic-and-unwrap-are-good)
-  - [Traits](#traits)
-    - [The From trait](#the-from-trait)
-    - [Taking a String and a &str in a function](#taking-a-string-and-a-str-in-a-function)
-  - [Chaining methods](#chaining-methods)
-  - [Iterators](#iterators)
-    - [How an iterator works](#how-an-iterator-works)
-  - [Closures](#closures)
-    - [|_| in a closure](#_-in-a-closure)
-    - [Helpful methods for closures and iterators](#helpful-methods-for-closures-and-iterators)
-  - [The dbg! macro and .inspect](#the-dbg-macro-and-inspect)
-  - [Types of &str](#types-of-str)
-  - [Lifetimes](#lifetimes)
-  - [Interior mutability](#interior-mutability)
-    - [Cell](#cell)
-    - [RefCell](#refcell)
-    - [Mutex](#mutex)
-    - [RwLock](#rwlock)
-  - [Cow](#cow)
-  - [Type aliases](#type-aliases)
-    - [Importing and renaming inside a function](#importing-and-renaming-inside-a-function)
-  - [The todo! macro](#the-todo-macro)
-  - [Rc](#rc)
-  - [Multiple threads](#multiple-threads)
-  - [Closures in functions](#closures-in-functions)
-  - [impl Trait](#impl-trait)
-  - [Arc](#arc)
-  - [Channels](#channels)
-  - [Reading Rust documentation](#reading-rust-documentation)
-    - [assert_eq!](#assert_eq)
-    - [Searching](#searching)
-    - [[src] button](#src-button)
-    - [Information on traits](#information-on-traits)
-  - [Attributes](#attributes)
-  - [Box](#box)
-  - [Box around traits](#box-around-traits)
-  - [Default and the builder pattern](#default-and-the-builder-pattern)
-  - [Deref and DerefMut](#deref-and-derefmut)
-  - [Crates and modules](#crates-and-modules)
-  - [Testing](#testing)
-    - [Test-driven development](#test-driven-development)
-  - [External crates](#external-crates)
-    - [rand](#rand)
-    - [rayon](#rayon)
-    - [serde](#serde)
-    - [regex](#regex)
-    - [chrono](#chrono)
-  - [A tour of the standard library](#a-tour-of-the-standard-library)
-    - [Arrays](#arrays-1)
-    - [char](#char)
-    - [Integers](#integers)
-    - [Floats](#floats)
-    - [Bool](#bool)
-    - [Vec](#vec)
-    - [String](#string)
-    - [OsString and CString](#osstring-and-cstring)
-    - [Mem](#mem)
-    - [Prelude](#prelude)
-    - [Time](#time)
-    - [Other-macros](#other-macros)
-  - [Writing macros](#writing-macros)
-- [Part 2 - Rust on your computer](#part-2---rust-on-your-computer)
-  - [Cargo](#cargo)
-  - [Taking_user_input](#taking-user-input)
-  - [Using files](#using-files)
-  - [Cargo doc](#cargo-doc)
-  - [The end?](#the-end?)
+  - [Collection 타입](#collection-타입)
+    - [배열](#배열)
 
 # Part 1 - 브라우저에서의 Rust
 
@@ -1792,3 +1705,102 @@ fn main() {
 따라서 `let my_number = {100};`이라고 말하는 것과 거의 비슷합니다.
 
 또한, `my_number`는 `mut`이 아닙니다. 100이 될 때까지 값을 얻지 않았으므로 값을 변경된 적이 없습니다. 결국 `my_number`의 실제 코드는 `let my_number = 100;`입니다.
+
+## Collection 타입
+
+Rust는 collection(컬렉션)을 만들기 위한 많은 타입을 가지고 있습니다. Collection은 한 지점에 둘 이상의 값이 필요할 때 사용합니다. 예를 들면, 하나의 변수 안에 해당 국가의 모든 도시에 대한 정보가 있을 수 있습니다. 우리는 가장 빠르지만 기능이 가작 적은 배열부터 시작할 것입니다. 배열은 일종의 `&str`과 비슷합니다.
+
+### 배열
+
+배열은 `[]` 대괄호 안의 데이터입니다: 배열은:
+
+- 크기를 변경할 수 없고,
+- 하나의 동일한 타입만 포함해야 합니다.
+
+그렇지만 배열은 매우 빠릅니다.
+
+배열의 타입은 다음과 같습니다: `[type; number]`. 예를 들어 `["One", "Two"]`의 타입은 `[&str; 2]`입니다. 이는 아래의 두 배열이 다른 타입을 가진다는 것을 의미합니다:
+
+```rust
+fn main() {
+    let array1 = ["One", "Two"]; // 이것은 [&str; 2] 타입입니다.
+    let array2 = ["One", "Two", "Five"]; // 그러나 이것은 [&str; 3] 타입입니다. 다른 타입이지요!
+}
+```
+
+좋은 팁을 소개하겠습니다: 변수 유형을 알기 위해 컴파일러에 잘못된 지침을 줘서 "물어볼 수" 있습니다. 예를 들면:
+
+```rust
+fn main() {
+    let seasons = ["Spring", "Summer", "Autumn", "Winter"];
+    let seasons2 = ["Spring", "Summer", "Fall", "Autumn", "Winter"];
+    seasons.ddd(); // ⚠️
+    seasons2.thd(); // ⚠️ 또한
+}
+```
+
+아마 컴파일러는 "뭐라고? `seasons`에는 `.ddd()` 메소드가 없고, `seasons2`도 `.thd()` 메소드가 없어요!!" 라고 아래와 같이 말할 겁니다:
+
+```text
+error[E0599]: no method named `ddd` found for array `[&str; 4]` in the current scope
+ --> src\main.rs:4:13
+  |
+4 |     seasons.ddd(); // 
+  |             ^^^ method not found in `[&str; 4]`
+
+error[E0599]: no method named `thd` found for array `[&str; 5]` in the current scope
+ --> src\main.rs:5:14
+  |
+5 |     seasons2.thd(); // 
+  |              ^^^ method not found in `[&str; 5]`
+```
+
+따라서 컴파일러는 `` method not found in `[&str; 4]` ``의 타입을 말해주고 있습니다.
+
+만약 모든 값이 동일한 배열을 원한다면 아래와 같이 선언할 수 있습니다:
+
+```rust
+fn main() {
+    let my_array = ["a"; 10];
+    println!("{:?}", my_array);
+}
+```
+
+위 예제는 `["a", "a", "a", "a", "a", "a", "a", "a", "a", "a"]`를 출력합니다.
+
+이 방법은 버퍼(buffer)를 생성하는데 많이 사용됩니다. 예를 들어 `let mut buffer = [0; 640]`은 640개의 0으로 구성된 배열을 생성합니다. 그런 다음 데이터를 넣기 위해 0을 다른 숫자로 변경할 수 있습니다.
+
+`[]`를 사용하여 배열의 항목을 인덱싱(가져오기) 할 수 있습니다. 첫번째 항목은 `[0]`, 두번째 항목은 `[2]` 등과 같이 사용합니다.
+
+```rust
+fn main() {
+    let my_numbers = [0, 10, -20];
+    println!("{}", my_numbers[1]); // 10을 출력합니다.
+}
+```
+
+배열의 slice(조각)을 얻을 수도 있습니다. 컴파일러가 크기를 모르기 때문에 먼저 `&`가 필요합니다. 그런 다음 `..`를 사용하여 범위를 표시하면 됩니다.
+
+예를 들어 이 배열을 사용해보겠습니다: `[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]`.
+
+```rust
+fn main() {
+    let array_of_ten = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+    let three_to_five = &array_of_ten[2..5];
+    let start_at_two = &array_of_ten[1..];
+    let end_at_five = &array_of_ten[..5];
+    let everything = &array_of_ten[..];
+
+    println!("Three to five: {:?}, start at two: {:?}, end at five: {:?}, everything: {:?}", three_to_five, start_at_two, end_at_five, everything);
+}
+```
+
+기억하세요:
+
+- 인덱스 번호는 0에서 시작합니다 (1이 아닙니다).
+- 인덱스 범위는 **exclusive(제외)** 합니다 (마지막 숫자는 포함하지 않습니다).
+
+그래서 `[0..2]`는 첫번째 인덱스와 두번째 인덱스를(0과 1) 의미합니다. 혹은 "0번 그리고 1번" 인덱스라고 부를 수 있씁니다. 2번 인덱스를 의미하는 세번째 항목은 가지고 있지 않습니다.
+
+또한 **inclusive(포함)** 하는 범위를 가질 수 있습니다, 다시 말해 마지막 숫자도 포함시키는 것을 말합니다. 그렇게 하기 위해서는 `=`를 추가하여 `..` 대신 `..=`를 사용합니다. 따라서 첫번째, 두번째, 세번째 항목을 원한다면 `[0..2]` 대신 `[0..=2]`를 사용하면 됩니다.
