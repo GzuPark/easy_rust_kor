@@ -59,6 +59,7 @@ Rust는 새로운 언어지만 이미 아주 인기가 있습니다. 그 인기�
   - [벡터](#벡터)
   - [튜플](#튜플)
   - [제어 흐름](#제어-흐름)
+  - [구조체](#구조체)
 
 # Part 1 - 브라우저에서의 Rust
 
@@ -2286,4 +2287,133 @@ fn main() {
 Looks like a normal number
 13 is unlucky in North America, lucky in Italy! In bocca al lupo!
 4 is an unlucky number in China (sounds close to 死)!
+```
+
+## 구조체
+**See this chapter on YouTube: [Part 1](https://youtu.be/W23uQghBOFk) and [Part 2](https://youtu.be/GSVhrjLCuNA)**
+
+구조체(Struct)를 사용하여 고유한 타입을 생성할 수 있습니다. 구조체는 매우 편리하기 때문에 Rust에서 항상 사용하게 될 것입니다. 구조체는 키워드 `struct`로 생성됩니다. 구조체 이름은 UpperCamelCase로 해야합니다(각 단어의 첫 문자가 대문자이고, 공백이 없어야 합니다). 구조체를 모두 소문자로 작성하면 컴파일러에서 알려줍니다.
+
+구조체에는 세 가지 타입이 있습니다. 하나는 "unit struct(단위 구조체)" 입니다. 단위는 "아무것도 없다"라는 뜻입니다. 단위 구조체의 경우 이름과 세미콜론을 쓰기만 하면 됩니다.
+
+```rust
+struct FileDirectory;
+fn main() {}
+```
+
+다음은 튜플 구조체 또는 이름이 없는 구조체입니다. 필드 이름이 아닌 유형만 작성하면 되므로 "unnamed(이름 없음)"이라고 합니다. 튜플 구조체는 간단한 구조체가 필요하고 이름을 기억할 필요가 없을 때 좋습니다.
+
+```rust
+struct Colour(u8, u8, u8);
+
+fn main() {
+    let my_colour = Colour(50, 0, 50); // RGB(red, green, blue)을 이용해 색을 만듭니다.
+    println!("The second part of the colour is: {}", my_colour.1);
+}
+```
+
+위 내용은 `The second part of the colour is: 0`을 출력합니다.
+
+세번째 타입은 이름이 있는 구조체입니다. 아마 가장 일반적인 구조체일 것입니다. 이 구조체에서는 `{}` 코드블럭 내에서 필드 이름과 타입을 선언합니다. 명명된 구조체 뒤에는 세미콜론을 쓰지 않는데 왜냐하면 그 뒤에 전체 코드블럭이 있기 때문입니다.
+
+```rust
+struct Colour(u8, u8, u8); // 동일한 Colour 튜플 구조체를 선언합니다.
+
+struct SizeAndColour {
+    size: u32,
+    colour: Colour, // 그리고 새롭게 이름을 부여한 구조체 안에 넣습니다.
+}
+
+fn main() {
+    let my_colour = Colour(50, 0, 50);
+
+    let size_and_colour = SizeAndColour {
+        size: 150,
+        colour: my_colour
+    };
+}
+```
+
+명명된 구조체에서도 쉼표로 필드를 구분합니다. 마지막 필드에 쉼표를 추가할지 여부는 사용자에게 달려 있습니다. `SizeAndColour`의 `color`뒤에는 쉼표가 있습니다.
+
+```rust
+struct Colour(u8, u8, u8); // 동일한 Colour 튜플 구조체를 선언합니다.
+
+struct SizeAndColour {
+    size: u32,
+    colour: Colour, // 그리고 새롭게 이름을 부여한 구조체 안에 넣습니다.
+}
+
+fn main() {}
+```
+
+하지만 쉼표가 필요 필요하지 않기도 합니다. 그럼에도 불구하고 때때로 필드의 순서를 변경할 수 있기 때문에 항상 쉼표를 사용하는 것이 좋습니다.
+
+```rust
+struct Colour(u8, u8, u8); // 동일한 Colour 튜플 구조체를 선언합니다.
+
+struct SizeAndColour {
+    size: u32,
+    colour: Colour // 여기엔 쉼표가 없습니다.
+}
+
+fn main() {}
+```
+
+그런 다음 순서를 변경해보기로 결정합니다...
+
+```rust
+struct SizeAndColour {
+    colour: Colour // ⚠️ 이런! 쉽표가 없습니다.
+    size: u32,
+}
+
+fn main() {}
+```
+
+그러나 어느 쪽이든 그다지 중요하지 않으므로 쉼표를 사용할지 여부를 선택할 수 있습니다.
+
+
+예를 들어 `Country`라는 구조체를 만들어 보겠습니다. `Country` 구조체에는 `poplulation`, `capital`, 그리고 `leader_name`이라는 필드가 있습니다.
+
+```rust
+struct Country {
+    population: u32,
+    capital: String,
+    leader_name: String
+}
+
+fn main() {
+    let population = 500_000;
+    let capital = String::from("Elista");
+    let leader_name = String::from("Batu Khasikov");
+
+    let kalmykia = Country {
+        population: population,
+        capital: capital,
+        leader_name: leader_name,
+    };
+}
+```
+
+위에서 같은 내용을 두번 쓴것을 눈치챘나요? `population: population`, `capital: capital`, 그리고 `leader_name: leader_name`라고 작성했습니다. 사실 그렇게 할 필요가 없습니다. 필드 이름과 변수 이름이 같으면 두 번 쓸 필요가 없습니다.
+
+```rust
+struct Country {
+    population: u32,
+    capital: String,
+    leader_name: String
+}
+
+fn main() {
+    let population = 500_000;
+    let capital = String::from("Elista");
+    let leader_name = String::from("Batu Khasikov");
+
+    let kalmykia = Country {
+        population,
+        capital,
+        leader_name,
+    };
+}
 ```
