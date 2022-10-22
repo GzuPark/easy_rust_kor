@@ -60,6 +60,8 @@ Rust는 새로운 언어지만 이미 아주 인기가 있습니다. 그 인기�
   - [튜플](#튜플)
   - [제어 흐름](#제어-흐름)
   - [구조체](#구조체)
+  - [Enum](#enum)
+    - [Enum 에서 다양한 타입 사용하기](#enum-에서-다양한-타입-사용하기)
 
 # Part 1 - 브라우저에서의 Rust
 
@@ -2417,3 +2419,266 @@ fn main() {
     };
 }
 ```
+
+## Enum
+**See this chapter on YouTube: [Part 1](https://youtu.be/SRnqNTJUgjs), [Part 2](https://youtu.be/F_EcbWM63lk), [Part 3](https://youtu.be/2uh64U9JesA) and [Part 4](https://youtu.be/LOHVUYTc5Us)**
+
+An `enum` is short for enumerations. They look very similar to a struct, but are different. Here is the difference:
+`enum`은 enumeration(열거형)의 준말입니다. 구조체와 비슷하게 보이지만 엄연히 다릅니다. 차이점은 다음과 같습니다:
+
+- 한 가지 **그리고** 다른 것을 원할 때 `struct`를 사용하세요.
+- 한 가지 **또는** 다른 것을 원할 때 `enum`을 사용하세요.
+
+따라서 구조체는 **많은 것** 을 위한 것이고, enum은 **많은 선택** 을 위한 것입니다.
+
+Enum을 선언하려면 `enum`을 작성하고 쉼표로 구분된 옵션과 함께 코드 블럭을 사용합니다. `struct`와 마찬가지로 마지막 부분에는 쉼표가 있을 수도 있고 없을 수도 있습니다. `ThingInTheSky`라고 불리는 enum을 생성합니다:
+
+```rust
+enum ThingsInTheSky {
+    Sun,
+    Stars,
+}
+
+fn main() {}
+```
+
+태양이나 **또는** 별을 볼 수 있기 때문에 enum 입니다: 하나만 선택해야합니다. 이를 **variants(변형)** 이라고 합니다.
+
+```rust
+// 두 가지 선택을 가지는 enum을 생성합니다.
+enum ThingsInTheSky {
+    Sun,
+    Stars,
+}
+
+// 이 함수로 i32 타입을 사용하여 ThingsInTheSky를 생성할 수 있습니다.
+fn create_skystate(time: i32) -> ThingsInTheSky {
+    match time {
+        6..=18 => ThingsInTheSky::Sun, // 6시에서 18시 사이에는 태양을 볼 수 있습니다.
+        _ => ThingsInTheSky::Stars, // 다른 시각에는 별을 볼 수 있습니다.
+    }
+}
+
+// 이 함수를 사용하면 ThinksInTheSky의 두 가지 선택 항목 중 일치시킬 수 있습니다.
+fn check_skystate(state: &ThingsInTheSky) {
+    match state {
+        ThingsInTheSky::Sun => println!("I can see the sun!"),
+        ThingsInTheSky::Stars => println!("I can see the stars!")
+    }
+}
+
+fn main() {
+    let time = 8; // 8시 입니다.
+    let skystate = create_skystate(time); // create_skystate 함수는 ThingsInTheSky를 반환합니다.
+    check_skystate(&skystate); // 변수 skystate를 읽을 수 있도록 참조로 전달합니다.
+}
+```
+
+위 예제는 `I can see the sun!`을 출력합니다.
+
+Enum에 데이터를 추가할 수도 있습니다.
+
+```rust
+enum ThingsInTheSky {
+    Sun(String), // 각 variant에는 enum이 있습니다.
+    Stars(String),
+}
+
+fn create_skystate(time: i32) -> ThingsInTheSky {
+    match time {
+        6..=18 => ThingsInTheSky::Sun(String::from("I can see the sun!")), // 문자열을 작성하세요.
+        _ => ThingsInTheSky::Stars(String::from("I can see the stars!")),
+    }
+}
+
+fn check_skystate(state: &ThingsInTheSky) {
+    match state {
+        ThingsInTheSky::Sun(description) => println!("{}", description), // 이름 설명에 대한 문자열을 넣으면 이제 사용할 수 있습니다.
+        ThingsInTheSky::Stars(n) => println!("{}", n), // 또는 이름을 n으로 지정할 수 있습니다. 또는 그 무엇이든 지정할 수 있습니다. (중요한게 아닙니다)
+    }
+}
+
+fn main() {
+    let time = 8; // 8시 입니다.
+    let skystate = create_skystate(time); // create_skystate 함수는 ThingsInTheSky를 반환합니다.
+    check_skystate(&skystate); //  변수 skystate를 읽을 수 있도록 참조로 전달합니다.
+}
+```
+
+위 내용은 똑같이 `I can see the sun!`을 출력합니다.
+
+Enum을 "import"할 수 있으므로 너무 많이 입력할 필요가 없습니다. 기분에 따라 일치하는 `Mood::` 타입을 입력하는 예제입니다:
+
+```rust
+enum Mood {
+    Happy,
+    Sleepy,
+    NotBad,
+    Angry,
+}
+
+fn match_mood(mood: &Mood) -> i32 {
+    let happiness_level = match mood {
+        Mood::Happy => 10, // 매번 Mood:: 라는 타입을 입력합니다.
+        Mood::Sleepy => 6,
+        Mood::NotBad => 7,
+        Mood::Angry => 2,
+    };
+    happiness_level
+}
+
+fn main() {
+    let my_mood = Mood::NotBad;
+    let happiness_level = match_mood(&my_mood);
+    println!("Out of 1 to 10, my happiness is {}", happiness_level);
+}
+```
+
+`Out of 1 to 10, my happiness is 7`을 출력합니다. 더 적게 입력할 수 있도록 import 해보겠습니다. 모든 것을 import 하기 위해서는 `*`을 사용하세요. 참고: 역참조를 위한 `*` 키와 동일하지만 기능은 완전히 다릅니다.
+
+```rust
+enum Mood {
+    Happy,
+    Sleepy,
+    NotBad,
+    Angry,
+}
+
+fn match_mood(mood: &Mood) -> i32 {
+    use Mood::*; // Mood에 대한 모든 것을 import 했습니다. 이제 Happy, Sleepy 등을 쓸 수 있습니다.
+    let happiness_level = match mood {
+        Happy => 10, // 더 이상 Mood:: 라는 타입을 적을 필요 없습니다.
+        Sleepy => 6,
+        NotBad => 7,
+        Angry => 2,
+    };
+    happiness_level
+}
+
+fn main() {
+    let my_mood = Mood::Happy;
+    let happiness_level = match_mood(&my_mood);
+    println!("Out of 1 to 10, my happiness is {}", happiness_level);
+}
+```
+
+
+`enum`의 일부도 정수로 변환될 수 있습니다. 그 이유는 Rust가 `enum`의 각 부분에 0으로 시작하는 숫자를 자체적으로 사용하기 때문입니다. Enum에 다른 데이터가 없으면 이를 작업할 때 사용할 수 있습니다.
+
+```rust
+enum Season {
+    Spring, // 만약 Spring(String)이거나 다른 것이라면 동작하지 않을 겁니다.
+    Summer,
+    Autumn,
+    Winter,
+}
+
+fn main() {
+    use Season::*;
+    let four_seasons = vec![Spring, Summer, Autumn, Winter];
+    for season in four_seasons {
+        println!("{}", season as u32);
+    }
+}
+```
+
+위 예제는 아래와 같이 출력됩니다:
+
+```text
+0
+1
+2
+3
+```
+
+원한다면 다른 번호를 줄 수도 있지만 (Rust는 상관하지 않습니다.) 그냥 같은 방식으로 사용할 수도 있습니다. 번호를 갖고 싶은 variant에 `=`와 원하는 번호를 추가하기만 하면 됩니다. 모두에게 번호를 줄 필요는 없습니다. 하지만 만약 그렇게 하지 않는다면 Rust는 이전의 arm에서 단순히 1을 더한 것을 사용할 겁니다.
+
+```rust
+enum Star {
+    BrownDwarf = 10,
+    RedDwarf = 50,
+    YellowStar = 100,
+    RedGiant = 1000,
+    DeadStar, // 한 번 생각해보세요. 어떤 숫자가 될까요?
+}
+
+fn main() {
+    use Star::*;
+    let starvec = vec![BrownDwarf, RedDwarf, YellowStar, RedGiant];
+    for star in starvec {
+        match star as u32 {
+            size if size <= 80 => println!("Not the biggest star."), // 기억하세요: 크기는 아무 의미가 없습니다. 출력할 수 있도록 선택한 이름일 뿐입니다.
+            size if size >= 80 => println!("This is a good-sized star."),
+            _ => println!("That star is pretty big!"),
+        }
+    }
+    println!("What about DeadStar? It's the number {}.", DeadStar as u32);
+}
+```
+
+아래와 같이 출력됩니다:
+
+
+```text
+Not the biggest star.
+Not the biggest star.
+This is a good-sized star.
+This is a good-sized star.
+What about DeadStar? It's the number 1001.
+```
+
+`DeadStar`는 4라는 숫자였을텐데 이제 1001이 되었습니다.
+
+### Enum 에서 다양한 타입 사용하기
+
+`Vec`, 배열 등의 항목은 모두 동일한 타입이 필요합니다(오직 튜플만 예외입니다). 그러나 enum은 다른 타입을 넣어서 사용할 수 있습니다. `u32` 또는 `i32`와 함께 `Vec`을 갖고 싶다고 상상해보세요. 물론 `Vec<(u32, i32)>`(`(u32, i32)` 튜플을 가지고 있는 벡터)를 만들 수 있겠지만 매번 하나만 원한다고 해봅시다. 따라서 enum을 사용하면 됩니다. 다음은 간단한 예제입니다:
+
+```rust
+enum Number {
+    U32(u32),
+    I32(i32),
+}
+
+fn main() {}
+```
+
+두 개의 variants가 있습니다: `u32`를 가지는 `U32` variant와 `i32`를 가지는 `I32` variant입니다. `U32`와 `I32`는 우리가 만든 이름일 뿐입니다. `UThirtyTwo` 또는 `IThirtyTwo` 또는 다른 무엇이든 될 수 있습니다.
+
+이제 이것들을 `Vec`에 넣으면 `Vec<Number>`만 있고 컴파일러는 모두 같은 타입이기 때문에 만족합니다. 컴파일러는 `u32` 또는 `i32`가 모두 `Number`라는 단일 타입 안에 있기 때문에 신경쓰지 않습니다. 그리고 enum이기 때문에 우리가 원하는 것 중 하나를 선택해야 합니다. `.is_positive()` 메소드를 사용하여 선택할 것입니다. `true`이면 `U32`를 선택하고, `false`이면 `I32`를 선택합니다.
+
+코드는 다음과 같습니다:
+
+```rust
+enum Number {
+    U32(u32),
+    I32(i32),
+}
+
+fn get_number(input: i32) -> Number {
+    let number = match input.is_positive() {
+        true => Number::U32(input as u32), // 양수면 u32로 변경하세요.
+        false => Number::I32(input), // 그렇지 않으면 이지 i32 이므로 번호를 지정해주세요.
+    };
+    number
+}
+
+
+fn main() {
+    let my_vec = vec![get_number(-800), get_number(8)];
+
+    for item in my_vec {
+        match item {
+            Number::U32(number) => println!("It's a u32 with the value {}", number),
+            Number::I32(number) => println!("It's an i32 with the value {}", number),
+        }
+    }
+}
+```
+
+이제 우리가 보고 싶었던 것을 출력합니다:
+
+```text
+It's an i32 with the value -800
+It's a u32 with the value 8
+```
+
