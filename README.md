@@ -63,6 +63,7 @@ Rust는 새로운 언어지만 이미 아주 인기가 있습니다. 그 인기�
   - [Enum](#enum)
     - [Enum 에서 다양한 타입 사용하기](#enum-에서-다양한-타입-사용하기)
   - [반복문](#반복문)
+  - [struct와 enum의 실행 메서드](#struct와-enum의-실행-메서드)
 
 # Part 1 - 브라우저에서의 Rust
 
@@ -2915,3 +2916,117 @@ Each colour has at least 10.
 Comparing a colour with 200 red, 50 blue, and 0 green:
 Not much green.
 ```
+
+## struct와 enum의 실행 메서드
+
+`struct`와 `enum`에 실질적인 힘을 주기 시작하겠습니다. `struct` 또는 `enum`에서 함수를 호출하려면 `impl` 블럭을 사용하세요. 이런 기능을 **method(메서드)** 라고 합니다. `impl` 블럭에는 두 가지 종류의 메서드가 있습니다.
+
+- Method(메서드): **self** (또는 **&self** 또는 **&mut self**)를 사용합니다. 일반 메서드는 `.`(마침표)를 사용합니다. `.clone()`은 일반 메서드의 예입니다.
+- Assciated function(관련 함수, 일부 언어에서는 "정적" 메서드라고 합니다): self를 사용하지 않습니다. Associated는 "관련된"을 의미합니다. `::`를 사용하여 다르게 작성됩니다. `String::from()`은 관련 함수이고, `Vec::new()`도 마찬가지 입니다. 새 변수를 생성하는 데 가장 자주 사용되는 관련 함수를 볼 수 있습니다.
+
+Animal을 생성하고 출력하는 예제를 다룰 예정입니다.
+
+새로운 `struct` 또는 `enum`의 경우 `{:?}`을 사용하여 출력하려면 **Debug** 를 지정해야 합니다. `struct` 또는 `enum` 위에 `#[derive(Debug)]`를 작성하면 `{:?}`로 출력할 수 있습니다. `#[]`가 있는 메세지를 **attributes(속성)** 이라고 합니다. 때때로 이것들을 사용하여 `struct`에 `Debug`와 같은 기능을 제공하도록 컴파일러에 지시할 수 있습니다. 많은 속성이 있으며 나중에 이에 대해 배울 것입니다. 그러나 `derive`는 아마도 가장 일반적이며 `struct`와 `enum` 위에서 많이 볼 수 있습니다.
+
+```rust
+#[derive(Debug)]
+struct Animal {
+    age: u8,
+    animal_type: AnimalType,
+}
+
+#[derive(Debug)]
+enum AnimalType {
+    Cat,
+    Dog,
+}
+
+impl Animal {
+    fn new() -> Self {
+        // Self는 Animal을 의미합니다.
+        // Self 대신 Animal을 쓸 수도 있습니다.
+
+        Self {
+            // Animal::new()를 작성할 때 항상 나이가 10살인 고양이를 얻을 수 있습니다.
+            age: 10,
+            animal_type: AnimalType::Cat,
+        }
+    }
+
+    fn change_to_dog(&mut self) { // Animal 안에 있기 때문에 &mut self는 &mut Animal을 의미합니다.
+                                  // .change_to_dog()을 사용하여 고양이를 개로 변경합니다.
+                                  // &mut self를 사용하여 변경할 수 있습니다.
+        println!("Changing animal to dog!");
+        self.animal_type = AnimalType::Dog;
+    }
+
+    fn change_to_cat(&mut self) {
+        // .change_to_dog()을 사용하여 개를 고양이로 변경합니다.
+        // &mut self를 사용하여 변경할 수 있습니다.
+        println!("Changing animal to cat!");
+        self.animal_type = AnimalType::Cat;
+    }
+
+    fn check_type(&self) {
+        // self를 읽고 싶습니다.
+        match self.animal_type {
+            AnimalType::Dog => println!("The animal is a dog"),
+            AnimalType::Cat => println!("The animal is a cat"),
+        }
+    }
+}
+
+
+
+fn main() {
+    let mut new_animal = Animal::new(); // 새 Animal을 만드는 관련 함수입니다.
+                                        // 10살 짜리 고양이입니다.
+    new_animal.check_type();
+    new_animal.change_to_dog();
+    new_animal.check_type();
+    new_animal.change_to_cat();
+    new_animal.check_type();
+}
+```
+
+위 예는 아래와 같이 출력됩니다:
+
+```text
+The animal is a cat
+Changing animal to dog!
+The animal is a dog
+Changing animal to cat!
+The animal is a cat
+```
+
+
+Self (Self 타입)과 self(변수 self)는 약어임을 기억하세요. (약어 = 짧게 표현하는 방법)
+
+따라서 위 코드에서 Self = Animal 입니다. 또한, `fn change_to_dog(&mut self)`는 `fn change_to_dog(&mut Animal)`을 의미합니다.
+
+아래에 작은 예제 하나 더 소개하겠습니다. 이번에는 `enum`에 `impl`을 사용해보겠습니다:
+
+```rust
+enum Mood {
+    Good,
+    Bad,
+    Sleepy,
+}
+
+impl Mood {
+    fn check(&self) {
+        match self {
+            Mood::Good => println!("Feeling good!"),
+            Mood::Bad => println!("Eh, not feeling so good"),
+            Mood::Sleepy => println!("Need sleep NOW"),
+        }
+    }
+}
+
+fn main() {
+    let my_mood = Mood::Sleepy;
+    my_mood.check();
+}
+```
+
+`Need sleep NOW`로 출력됩니다.
