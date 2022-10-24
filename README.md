@@ -62,6 +62,7 @@ Rust는 새로운 언어지만 이미 아주 인기가 있습니다. 그 인기�
   - [구조체](#구조체)
   - [Enum](#enum)
     - [Enum 에서 다양한 타입 사용하기](#enum-에서-다양한-타입-사용하기)
+  - [반복문](#반복문)
 
 # Part 1 - 브라우저에서의 Rust
 
@@ -2682,3 +2683,235 @@ It's an i32 with the value -800
 It's a u32 with the value 8
 ```
 
+## 반복문
+
+반복문(Loop)를 사용하면 Rust에게 멈추고 싶을 때까지 계속하도록 말할 수 있습니다. `break`할 때를 알려주지 않는 한 `loop`를 사용하여 멈추지 않는 반복문을 실행합니다.
+
+```rust
+fn main() { // 이 프로그램은 절대 멈추지 않습니다.
+    loop {
+
+    }
+}
+```
+
+따라서 컴파일러가 언제 `break`할 수 있는지 알려줘야 합니다.
+
+```rust
+fn main() {
+    let mut counter = 0; // counter를 0으로 설정합니다.
+    loop {
+        counter +=1; // counter를 1씩 증가시킵니다.
+        println!("The counter is now: {}", counter);
+        if counter == 5 { // counter == 5 일 때 중지합니다.
+            break;
+        }
+    }
+}
+```
+
+다음과 같이 출력합니다:
+
+```text
+The counter is now: 1
+The counter is now: 2
+The counter is now: 3
+The counter is now: 4
+The counter is now: 5
+```
+
+반복문 내부에 반복문이 있는 경우 이름을 지정할 수 있습니다. 이름을 사용해서 어떤 반복문을 `break`할지 Rust에게 알려줄 수 있습니다. `'`("틱"이라고 합니다)과 `:`를 사용하여 이름을 지정합니다.
+
+```rust
+fn main() {
+    let mut counter = 0;
+    let mut counter2 = 0;
+    println!("Now entering the first loop.");
+
+    'first_loop: loop {
+        // 첫번째 반복문에 이름을 지정합니다.
+        counter += 1;
+        println!("The counter is now: {}", counter);
+        if counter > 9 {
+            // 이 반복문 안에서 두번째 반복문을 시작합니다.
+            println!("Now entering the second loop.");
+
+            'second_loop: loop {
+                // 'second_loop 안에 있습니다.
+                println!("The second counter is now: {}", counter2);
+                counter2 += 1;
+                if counter2 == 3 {
+                    break 'first_loop; // 프로그램을 종료할 수 있도록 'first_loop에서 나옵니다.
+                }
+            }
+        }
+    }
+}
+```
+
+위는 아래와 같이 출력합니다:
+
+```text
+Now entering the first loop.
+The counter is now: 1
+The counter is now: 2
+The counter is now: 3
+The counter is now: 4
+The counter is now: 5
+The counter is now: 6
+The counter is now: 7
+The counter is now: 8
+The counter is now: 10
+The counter is now: 9
+Now entering the second loop.
+The second counter is now: 0
+The second counter is now: 1
+The second counter is now: 2
+```
+
+`while` 반복문은 `true`가 지속되는 동안 반복되는 것입니다. 각 반복문에서 Rust는 계속 `true`인지 확인할 겁니다. 만약 `false`가 된다면 Rust는 반복문을 멈출 것입니다.
+
+```rust
+fn main() {
+    let mut counter = 0;
+
+    while counter < 5 {
+        counter +=1;
+        println!("The counter is now: {}", counter);
+    }
+}
+```
+
+`for` 반복문을 사용하면 Rust에게 매번 무엇을 해야 하는지 알려줘야 합니다. 하지만 `for` 반복문에서 반복문은 특정 횟수 이후에 멈춥니다. `for` 반복문은 **범위** 를 매우 자주 사용합니다. `..`와 `..=`을 사용하여 범위를 설정합니다.
+
+- `..`는 **포함하지 않는** 범위를 생성합니다: `0..3`은 `0, 1, 2`를 생성합니다.
+- `..=`는 **포함하는** 범위를 생성합니다: `0..=3`은 `0, 1, 2, 3`을 생성합니다.
+
+```rust
+fn main() {
+    for number in 0..3 {
+        println!("The number is: {}", number);
+    }
+
+    for number in 0..=3 {
+        println!("The next number is: {}", number);
+    }
+}
+```
+
+아래와 같이 출력됩니다:
+
+```text
+The number is: 0
+The number is: 1
+The number is: 2
+The next number is: 0
+The next number is: 1
+The next number is: 2
+The next number is: 3
+```
+
+또한 `number`는 `0..3`에 대한 변수 이름이 됩니다. `n`, `ntod_het__hno_f`, 또는 그 무엇이든 이름으로 정할 수 있었습니다. 그런 다음 `println!`에서 변수 이름을 사용할 수 있습니다.
+
+만약 변수 이름이 필요하지 않다면 `_`를 사용하세요.
+
+```rust
+fn main() {
+    for _ in 0..3 {
+        println!("Printing the same thing three times");
+    }
+}
+```
+
+다음과 같이 출력됩니다:
+
+```text
+Printing the same thing three times
+Printing the same thing three times
+Printing the same thing three times
+```
+
+왜냐하면 매번 출력할 숫자를 지정하지 않았기 때문입니다.
+
+그리고 실제로 만약 변수 이름을 지정하고 사용하지 않으면 Rust는 다음과 같이 알려줍니다:
+
+```rust
+fn main() {
+    for number in 0..3 {
+        println!("Printing the same thing three times");
+    }
+}
+```
+
+아래와 같은 내용을 출력합니다,. 프로그램은 잘 컴파일되었지만 Rust는 `number`를 사용하지 않았다는 사실을 알려줄 것입니다:
+
+```text
+warning: unused variable: `number`
+ --> src\main.rs:2:9
+  |
+2 |     for number in 0..3 {
+  |         ^^^^^^ help: if this is intentional, prefix it with an underscore: `_number`
+```
+
+Rust는 `_` 대신 `_number`를 쓸 것을 제안합니다. 변수 이름 앞에 `_`를 붙이면 "아마 나중에 사용할 예정이다"라는 의미입니다. 그러나 `_`만 사용하는 것은 "나는 이 변수에 대해 전혀 신경쓰지 않는다"는 것을 의미합니다. 따라서 나중에 변수 이름을 사용하고 컴파일러가 변수 이름에 대해 알려주지 않으려면 변수 이름 앞에 `_`를 넣을 수 있습니다.
+
+`break`를 사용하여 값을 반환할 수도 있습니다. `break` 바로 뒤에 값을 쓰고 `;`을 사용합니다. 다음은 `loop`와 `my_number`에 값을 전달하는 `break`가 있는 예시입니다.
+
+```rust
+fn main() {
+    let mut counter = 5;
+    let my_number = loop {
+        counter +=1;
+        if counter % 53 == 3 {
+            break counter;
+        }
+    };
+    println!("{}", my_number);
+}
+```
+
+위 예제는 `56`을 출력합니다. `break counter;`는 "counter 값을 중단하고 반환하라"라는 의미입니다. 그리고 전체 블럭이 `let`으로 시작하기 때문에 `my_number`가 값을 전달 받습니다.
+
+반복문을 사용하는 방법을 알았으므로 이전의 colours 문제에서 `match`에 대해 더 좋은 해결법이 있습니다. 모든 것을 비교하고 `for` 반복문이 모든 항목을 살펴보기 때문에 더 좋은 해결방법입니다.
+
+```rust
+fn match_colours(rbg: (i32, i32, i32)) {
+    println!("Comparing a colour with {} red, {} blue, and {} green:", rbg.0, rbg.1, rbg.2);
+    let new_vec = vec![(rbg.0, "red"), (rbg.1, "blue"), (rbg.2, "green")]; // Vec에 색을 넣어줍니다. 내부에는 색상 이름이 있는 튜플이 있습니다.
+    let mut all_have_at_least_10 = true; // true로 시작합니다. 한 색상이 10보다 작으면 false로 설정합니다.
+    for item in new_vec {
+        if item.0 < 10 {
+            all_have_at_least_10 = false; // 이제 false 입니다.
+            println!("Not much {}.", item.1) // 그리고 색상 이름을 출력합니다.
+        }
+    }
+    if all_have_at_least_10 { // 여전히 true인지 확인하고, true라면 출력합니다.
+        println!("Each colour has at least 10.")
+    }
+    println!(); // 빈 줄을 추가합니다.
+}
+
+fn main() {
+    let first = (200, 0, 0);
+    let second = (50, 50, 50);
+    let third = (200, 50, 0);
+
+    match_colours(first);
+    match_colours(second);
+    match_colours(third);
+}
+```
+
+아래와 같이 출력됩니다:
+
+```text
+Comparing a colour with 200 red, 0 blue, and 0 green:
+Not much blue.
+Not much green.
+
+Comparing a colour with 50 red, 50 blue, and 50 green:
+Each colour has at least 10.
+
+Comparing a colour with 200 red, 50 blue, and 0 green:
+Not much green.
+```
