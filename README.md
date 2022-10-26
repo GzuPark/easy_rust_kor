@@ -65,6 +65,7 @@ Rust는 새로운 언어지만 이미 아주 인기가 있습니다. 그 인기�
   - [반복문](#반복문)
   - [struct와 enum의 실행 메서드](#struct와-enum의-실행-메서드)
   - [역구조화](#역구조화)
+  - [참조와 dot 연산](#참조와-dot-연산)
 
 # Part 1 - 브라우저에서의 Rust
 
@@ -3109,3 +3110,99 @@ fn main() {
 ```
 
 `The city's two names are ["Tallinn", "Reval"]`라고 출력합니다.
+
+## 참조와 dot 연산
+
+참조가 있을 때 값을 얻기 위해 `*`를 사용한다는 것을 배웠습니다. 다음에서 참조는 다른 타입이므로 작동하지 않습니다.
+
+```rust
+fn main() {
+    let my_number = 9;
+    let reference = &my_number;
+
+    println!("{}", my_number == reference); // ⚠️
+}
+```
+
+컴파일러는 다음과 같이 출력합니다:
+
+```text
+error[E0277]: can't compare `{integer}` with `&{integer}`
+ --> src\main.rs:5:30
+  |
+5 |     println!("{}", my_number == reference);
+  |                              ^^ no implementation for `{integer} == &{integer}`
+```
+
+따라서 5행과 같이 `println!("{}", my_number == *reference);`로 변경하고, `i32` == `i32`가 아니라 `i32` == `&i32`이기 때문에 `true`를 출력합니다. 이것을 역참조라고 합니다.
+
+그러나 메소드를 사용하면 Rust가 역참조를 수행합니다. `.`은 dot(점) 연산자라고 하며 추가 수행 없이 역참조를 수행합니다.
+
+먼저 `u8` 필드가 하나 있는 구조체를 생성합니다. 그런 다음 참조 생성하고 비교해보겠습니다. 아래는 동작하지 않습니다:
+
+```rust
+struct Item {
+    number: u8,
+}
+
+fn main() {
+    let item = Item {
+        number: 8,
+    };
+
+    let reference_number = &item.number; // reference_number의 타입은 &u8 입니다.
+
+    println!("{}", reference_number == 8); // ⚠️ &u8 와 u8 는 비교할 수 없습니다.
+}
+```
+
+To make it work, we need to dereference: `println!("{}", *reference_number == 8);`.
+
+그러나 dot 연산을 사용하면 `*`이 필요하지 않습니다. 다음 예를 보면:
+
+```rust
+struct Item {
+    number: u8,
+}
+
+fn main() {
+    let item = Item {
+        number: 8,
+    };
+
+    let reference_item = &item;
+
+    println!("{}", reference_item.number == 8); // *reference_item.number 라고 작성할 필요가 없습니다.
+}
+```
+
+`number`를 다른 숫자와 비교하는 `Item`에 대한 메서드를 만들어 봅시다. 그 어느 곳에서도 `*`를 사용할 필요가 없습니다:
+
+```rust
+struct Item {
+    number: u8,
+}
+
+impl Item {
+    fn compare_number(&self, other_number: u8) { // 자기 자신을 참조합니다.
+        println!("Are {} and {} equal? {}", self.number, other_number, self.number == other_number);
+            // *self.number라고 사용할 필요가 없습니다.
+    }
+}
+
+fn main() {
+    let item = Item {
+        number: 8,
+    };
+
+    let reference_item = &item; // &Item의 타입입니다.
+    let reference_item_two = &reference_item; // &&Item의 타입입니다.
+
+    item.compare_number(8); // 메서드가 동작합니다.
+    reference_item.compare_number(8); // 이것도 동작합니다.
+    reference_item_two.compare_number(8); // 그리고 이것도 동작합니다.
+
+}
+```
+
+기억하세요: `.` 연산자를 사용할 때 `*`에 대해 걱정할 필요가 없습니다.
