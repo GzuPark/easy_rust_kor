@@ -64,6 +64,7 @@ Rust는 새로운 언어지만 이미 아주 인기가 있습니다. 그 인기�
     - [Enum 에서 다양한 타입 사용하기](#enum-에서-다양한-타입-사용하기)
   - [반복문](#반복문)
   - [struct와 enum의 실행 메서드](#struct와-enum의-실행-메서드)
+  - [역구조화](#역구조화)
 
 # Part 1 - 브라우저에서의 Rust
 
@@ -3030,3 +3031,81 @@ fn main() {
 ```
 
 `Need sleep NOW`로 출력됩니다.
+
+## 역구조화
+
+`destructuring`(역구조화)에 대해 더 살펴보겠습니다. `let`을 거꾸로 사용하여 구조체 또는 enum에서 값을 가져올 수 있습니다. 구조체의 일부가 아닌 변수를 가져오기 때문에 이를 `destructuring`이라고 배웠습니다. 이제 값이 별도로 있습니다. 첫번째 간단한 예시 입니다:
+
+```rust
+struct Person { // 간단한 구조체 Person을 생성합니다.
+    name: String,
+    real_name: String,
+    height: u8,
+    happiness: bool
+}
+
+fn main() {
+    let papa_doc = Person { // papa_doc 변수를 생성합니다.
+        name: "Papa Doc".to_string(),
+        real_name: "Clarence".to_string(),
+        height: 170,
+        happiness: false
+    };
+
+    let Person { // papa_doc를 역구조화합니다.
+        name: a,
+        real_name: b,
+        height: c,
+        happiness: d
+    } = papa_doc;
+
+    println!("They call him {} but his real name is {}. He is {} cm tall and is he happy? {}", a, b, c, d);
+}
+```
+
+다음과 같이 출력됩니다: `They call him Papa Doc but his real name is Clarence. He is 170 cm tall and is he happy? false`
+
+거꾸로 된 것을 확인할 수 있습니다. 먼저 구조체를 생성하기 위해 `let papa_doc = Person { fields }`라고 선언합니다. 그런 다음 `let Person { fields } = papa_doc`라고 말하여 구조를 역구조화합니다.
+
+`name: a`를 쓸 필요는 없습니다 - `name`만 쓰면 됩니다. 그러나 `a`라는 이름의 변수를 사용하기 원하기 때문에 `name:`을 사용합니다.
+
+이제 더 큰 예시입니다. 이 예시는 `City` 구조체가 있습니다. 그것을 만들기 위해 `new` 기능을 제공합니다. 그런 다음 값으로 작업을 수행하는 `process_city_values` 함수가 있습니다. 함수에서 `Vec`을 생성했지만 그것을 구조화한 후에 훨씬 더 많은 것을 할 수 있다고 상상할 수 있습니다.
+
+```rust
+struct City {
+    name: String,
+    name_before: String,
+    population: u32,
+    date_founded: u32,
+}
+
+impl City {
+    fn new(name: String, name_before: String, population: u32, date_founded: u32) -> Self {
+        Self {
+            name,
+            name_before,
+            population,
+            date_founded,
+        }
+    }
+}
+
+fn process_city_values(city: &City) {
+    let City {
+        name,
+        name_before,
+        population,
+        date_founded,
+    } = city;
+        // now we have the values to use separately
+    let two_names = vec![name, name_before];
+    println!("The city's two names are {:?}", two_names);
+}
+
+fn main() {
+    let tallinn = City::new("Tallinn".to_string(), "Reval".to_string(), 426_538, 1219);
+    process_city_values(&tallinn);
+}
+```
+
+`The city's two names are ["Tallinn", "Reval"]`라고 출력합니다.
